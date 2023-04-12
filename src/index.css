@@ -135,8 +135,6 @@ select {
   opacity: 0;
 }
 
-// otp-form
-
 .otp-form > span {
   display: none !important;
 }

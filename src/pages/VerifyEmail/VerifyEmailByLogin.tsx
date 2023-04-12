@@ -4,7 +4,7 @@ import { useMutation } from 'react-query'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import OtpInput from 'react18-input-otp'
-import { registerAccount, verifyAccount } from 'src/apis/auth.api'
+import { deleteOtp, registerAccount, verifyAccount } from 'src/apis/auth.api'
 const VerifyEmailByLogin = () => {
   const location = useLocation()
   const [count, setCount] = useState(Number(localStorage.getItem('count')) || 60)
@@ -35,6 +35,11 @@ const VerifyEmailByLogin = () => {
       toast.success('Đã gửi lại OTP!')
     }
   })
+  const backMutation = useMutation({
+    mutationFn: () => {
+      return deleteOtp(registerForm.email)
+    }
+  })
   const handleVerify = () => {
     registerMutation.mutate()
   }
@@ -48,6 +53,7 @@ const VerifyEmailByLogin = () => {
   const handleBack = () => {
     localStorage.removeItem('temp')
     navigate('/register')
+    backMutation.mutate()
   }
 
   // Timeout
@@ -111,7 +117,7 @@ const VerifyEmailByLogin = () => {
         >
           Xác nhận
         </button>
-        <button className='font-[600] mt-[20px] text-[14px] flex gap-x-[10px] leading-6 text-secondary'>
+        <div className='font-[600] mt-[20px] text-[14px] flex gap-x-[10px] leading-6 text-secondary'>
           <svg width={22} height={22} viewBox='0 0 22 22' fill='none' xmlns='http://www.w3.org/2000/svg'>
             <g clipPath='url(#clip0_2833_7141)'>
               <path
@@ -132,7 +138,7 @@ const VerifyEmailByLogin = () => {
             </defs>
           </svg>
           <button onClick={handleBack}>Trở lại Đăng ký</button>
-        </button>
+        </div>
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import { useContext, lazy, Suspense } from 'react'
-import { Navigate, Outlet, useRoutes } from 'react-router-dom'
+import { Navigate, Outlet, useLocation, useRoutes } from 'react-router-dom'
 import { AppContext } from './contexts/app.context'
 import DashboardLayout from './layouts/DashboardLayout/DashboardLayout'
 import RegisterLayout from './layouts/RegisterLayout'

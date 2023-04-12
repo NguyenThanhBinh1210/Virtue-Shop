@@ -81,7 +81,7 @@ const Login = () => {
       </Helmet>
       <div
         className={`dark:bg-[#1C1C24] dark:border-none bg-white border
-         z-10  mx-auto w-[556px] mobile:w-[327px] rounded-lg flex flex-col px-[60px] py-[50px] mobile:px-[38px]`}
+        z-10  mx-auto w-[556px] mobile:w-[327px] rounded-lg flex flex-col px-[60px] py-[50px] mobile:px-[38px]`}
       >
         <div className='mb-[20px]'>
           <h1 className={`dark:text-white text-[20px] leading-[30px] font-[600px] text-center mb-[10px]`}>
@@ -133,7 +133,6 @@ const Login = () => {
             name='email'
           />
           <div className='text-red-300 pt-2 pb-2'>{errors.email?.message ? errors.email?.message : ''}</div>
-
           <Input
             inputPassword={true}
             register={register}

@@ -18,7 +18,6 @@ export type QueryConfigS = {
 }
 const ProductList = () => {
   const queryParams: QueryConfigS = useQueryParams()
-  console.log(queryParams)
   const queryConfig: QueryConfigS = omitBy(
     {
       page: queryParams.page || 1,
@@ -49,7 +48,7 @@ const ProductList = () => {
     }
   })
 
-  const { data: dataAll2 } = useQuery({
+  const { data: dataAll2, isLoading: loading } = useQuery({
     queryFn: () => {
       return getAllProduct()
     }
@@ -64,11 +63,11 @@ const ProductList = () => {
       </Helmet>
       {productsData && (
         <>
-          <section className='flex justify-center mb-[45px]'>
+          {/* <section className='flex justify-center mb-[45px]'>
             <h1 className='font-[700] text-[25px] dark:text-white'>
               {t('full product')} {dataAll2?.data.data.length}
             </h1>
-          </section>
+          </section> */}
           <SortProductList categories={categoriesData?.data.data || []} queryConfig={queryConfig}></SortProductList>
           <div className='grid grid-cols-4 mobile:grid-cols-2 mobile:px-4 gap-[30px] mb-[30px]'>
             {productsData.data.data.map((product) => (

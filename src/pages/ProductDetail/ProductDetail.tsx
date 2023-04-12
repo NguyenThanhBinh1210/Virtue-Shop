@@ -17,13 +17,12 @@ const ProductDetail = () => {
   const [acctive, setActive] = useState(1)
   const { id: nameId } = useParams()
   const id = getIdFromNameId(nameId as string)
-  const [idState, setId] = useState<string>(id)
 
   const { t } = useTranslation('product')
   const { t: t2 } = useTranslation('home')
   const { data: productDetailData, isLoading } = useQuery({
-    queryKey: ['product', idState],
-    queryFn: () => getProductDetail(idState as string),
+    queryKey: ['product', id],
+    queryFn: () => getProductDetail(id as string),
     onSuccess: () => {
       window.scroll({
         top: 0,

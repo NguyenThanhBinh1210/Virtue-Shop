@@ -2,7 +2,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { getProfileFromLS, setProfileFromLS } from 'src/utils/auth'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { getUser, updateUser } from 'src/apis/auth.api'
+import { changePassword, getUser, updateUser } from 'src/apis/auth.api'
 import { User } from 'src/types/user.type'
 import { toast } from 'react-toastify'
 import Frame from '../../assets/images/Frame.jpg'
@@ -29,7 +29,6 @@ const Profile = () => {
   }
   const [formState, setFormState] = useState<FormStateType>(initialFromState)
   const [passwordState, setPasswordState] = useState(initialPasswordState)
-
   useEffect(() => {
     setFormState({
       name: profileAccessToken?.name,
@@ -63,11 +62,20 @@ const Profile = () => {
   })
   const changePasswordMutation = useMutation({
     mutationFn: () => {
-      // const newPassword = omit(passwordState, ['password'])
-      return updateUser(profileAccessToken._id, passwordState)
+      const body = {
+        email: profileAccessToken?.email,
+        password: passwordState.password,
+        new_password: passwordState.newPassword
+      }
+      return changePassword(body)
+    },
+    onError: (data: any) => {
+      toast.warn(data.response.data.message)
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(['user', profileAccessToken._id], data)
+      setDisableEmail(true)
+      console.log(data)
+      toast.success('Đã đổi mật khẩu thành công!')
     }
   })
   const handleChange = (name: keyof FormStateType) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,12 +87,7 @@ const Profile = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (passwordState.password !== '' && passwordState.newPassword !== '') {
-      changePasswordMutation.mutate(undefined, {
-        onSuccess: () => {
-          setDisableEmail(true)
-          toast.success(' Đã đổi mật khẩu thành công!')
-        }
-      })
+      changePasswordMutation.mutate()
     }
     if (passwordState.password === '' && passwordState.newPassword === '') {
       updateProfileMutation.mutate(undefined, {
@@ -189,7 +192,6 @@ const Profile = () => {
             </div>
           </div>
         </div>
-
         <div className='font-[700] text-[18px] flex justify-between mt-[40px] mb-[20px]'>
           <h1> {t('account')}</h1>
           <button
@@ -202,6 +204,7 @@ const Profile = () => {
             {isDisabledEmail ? `${t('edit')}` : `${t('close')}`}
           </button>
         </div>
+
         <div className='mb-6'>
           <label htmlFor='email' className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900 '>
             {t2('address')} email
@@ -217,10 +220,7 @@ const Profile = () => {
             onChange={handleChange('email')}
           />
         </div>
-        <div
-          className='grid grid-cols-2 gap-x-10
-      '
-        >
+        <div className='grid grid-cols-2 gap-x-10'>
           <div className='mb-6'>
             <label htmlFor='password' className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900 '>
               {t('old password')}
@@ -255,6 +255,8 @@ const Profile = () => {
             />
           </div>
         </div>
+
+        {/* Button */}
         <div className='flex justify-between'>
           {!isDisabled && (
             <button

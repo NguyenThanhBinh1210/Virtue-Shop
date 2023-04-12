@@ -1,13 +1,12 @@
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import Google from '../../assets/images/Google.png'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from 'react-query'
 import * as yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerAccount, verifyAccount } from 'src/apis/auth.api'
+import { verifyAccount } from 'src/apis/auth.api'
 import { toast } from 'react-toastify'
-import { AppContext } from 'src/contexts/app.context'
 import { Helmet } from 'react-helmet'
 
 const schema = yup
@@ -39,13 +38,16 @@ const Register = () => {
   } = useForm<FormData>({
     resolver: yupResolver(schema)
   })
-  const mutation = useMutation((body: { name: string; password: string; confirmPassword: string; email: string }) => {
-    return verifyAccount(body)
+
+  const registerMutation = useMutation({
+    mutationFn: (body: { email: string }) => {
+      return verifyAccount(body)
+    }
   })
   const navigate = useNavigate()
   const onSubmit = (data: FormData) => {
     if (term === true) {
-      mutation.mutate(data, {
+      registerMutation.mutate(data, {
         onSuccess: () => {
           toast.success('Xác thực nữa là thành công rồi!')
           localStorage.setItem('temp', JSON.stringify(data))
@@ -99,9 +101,10 @@ const Register = () => {
                 className={` dark:bg-transparent dark:text-text-color dark:border-[#3A3A43] rounded-lg border  h-[52px] w-full pl-[25px] ${
                   errors.name ? 'border-[#EB5757]' : 'border-[#F1F1F3]'
                 }`}
-                placeholder={errors.name ? errors.name?.message : 'Nguyễn Văn A'}
+                placeholder={'Nguyễn Văn A'}
               />
             </label>
+            <div className='text-red-300 pt-2 pb-2'>{errors.name?.message ? errors.name?.message : ''}</div>
           </div>
           <div className='mb-[10px] '>
             <label>
@@ -111,9 +114,10 @@ const Register = () => {
                 className={` dark:bg-transparent dark:text-text-color dark:border-[#3A3A43] rounded-lg border  h-[52px] w-full pl-[25px] ${
                   errors.email ? 'border-[#EB5757]' : 'border-[#F1F1F3]'
                 }`}
-                placeholder={errors.email ? errors.email?.message : 'example@gmail.com'}
+                placeholder={'example@gmail.com'}
               />
             </label>
+            <div className='text-red-300 pt-2 pb-2'>{errors.email?.message ? errors.email?.message : ''}</div>
           </div>
           <div className='mb-[10px]'>
             <label>
@@ -124,9 +128,10 @@ const Register = () => {
                 className={` dark:bg-transparent dark:text-text-color dark:border-[#3A3A43] rounded-lg border  h-[52px] w-full pl-[25px] ${
                   errors.password ? 'border-[#EB5757]' : 'border-[#F1F1F3]'
                 }`}
-                placeholder={errors.password ? errors.password?.message : 'Abc123@'}
+                placeholder={'Abc123@'}
               />
             </label>
+            <div className='text-red-300 pt-2 pb-2'>{errors.password?.message ? errors.password?.message : ''}</div>
           </div>
           <div className='mb-[10px]'>
             <label>
@@ -137,9 +142,12 @@ const Register = () => {
                 className={` dark:bg-transparent dark:text-text-color dark:border-[#3A3A43] rounded-lg border  h-[52px] w-full pl-[25px] ${
                   errors.confirmPassword ? 'border-[#EB5757]' : 'border-[#F1F1F3]'
                 }`}
-                placeholder={errors.confirmPassword ? errors.confirmPassword?.message : 'Abc123@'}
+                placeholder={'Abc123@'}
               />
             </label>
+            <div className='text-red-300 pt-2 pb-2'>
+              {errors.confirmPassword?.message ? errors.confirmPassword?.message : ''}
+            </div>
           </div>
 
           <div>

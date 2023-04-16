@@ -33,5 +33,13 @@
   "buy again": "Buy again",
   "evaluate": "Evaluate",
   "cancel": "Cancel",
-  "confirm": "Comfirm"
+  "confirm": "Comfirm",
+  "cancelled": "Cancelled",
+  "ok": "Comfirm",
+  "change address": "Want to change the shipping address",
+  "change purchase": "Want to change the product in the order (size, color, quantity,...)",
+  "pay method bad": "The payment procedure is too hassle",
+  "see new shop": "Find cheaper prices elsewhere",
+  "change your mind": "Change your mind and don't want to buy anymore",
+  "different": "Different"
 }

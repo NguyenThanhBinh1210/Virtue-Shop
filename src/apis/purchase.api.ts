@@ -12,6 +12,9 @@ export const buyProducts = (id: string, body: { product_id: string; buy_count: n
 export const buyProductsOnline = (id: string, body: { id: string; totalPrice: number }) => {
   return http.put(`/payment/${id}`, body)
 }
+export const cancelBuy = (id: string, body: { reason: string; purchase_id: string }) => {
+  return http.put(`/purchase/cancel-buy/${id}`, body)
+}
 
 export const updatePurchase = (id: string, body: { product_id: string; buy_count: number }) => {
   return http.put<Purchase>(`/purchase/update-purchase/${id}`, body)

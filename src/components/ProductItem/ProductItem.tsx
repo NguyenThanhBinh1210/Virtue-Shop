@@ -15,7 +15,7 @@ const ProductItem = ({ product }: Props) => {
         <div className='w-[250px] mobile:w-[170px] h-[400px] mobile:h-[250px] rounded-[25px] overflow-hidden '>
           <img src={product?.image[0]} alt={product?.name} />
         </div>
-        <div className='px-[20px] mobile:w-auto py-[15px] w-[271px] flex flex-col mobile:gap-y-[8px] gap-y-[15px]'>
+        <div className='px-[20px] mobile:w-auto py-[15px] w-[271px] flex flex-col mobile:gap-y-[0px] gap-y-[15px]'>
           <div className='flex items-center gap-2'>
             <div className='w-[18px] h-[18px] py-[2px]'>
               <img src={Vector} alt='' />
@@ -28,7 +28,7 @@ const ProductItem = ({ product }: Props) => {
             </h1>
             <p className='text-text-color text-[12px] leading-[18px]'>{product?.description}</p>
           </div>
-          <div className='flex gap-[50px] mobile:gap-[20px]'>
+          <div className='flex justify-between pr-5 mobile:pr-0'>
             <div className='flex flex-col'>
               <h2 className='font-[600] text-[14px] leading-6 dark:text-text-color'>
                 {FormatNumber(Number(product?.price_after_discount))}đ

@@ -19,6 +19,7 @@ const Navbar = () => {
       toast.success('Đăng xuất thành công!')
     }
   })
+  // const queryClient = useQueryClient()
   const handleLogout = () => {
     logOutMutation.mutate()
   }
@@ -90,9 +91,9 @@ const Navbar = () => {
               } hover:stroke-primary relative mb-5 dark:hover:bg-[#3A3A43] hover:bg-[#F1FBF7]
               w-[48px] h-[48px] flex items-center  justify-center rounded-lg `}
             >
-              {/* {profileAccessToken && (
+              {/* {isAuthenticated && (
                 <div className='absolute text-primary dark:border-2 dark:border-[#A2A2A8] dark:bg-[#3A3A43] dark:shadow-xl font-[600] top-0 right-0 shadow-md w-6 h-6 flex items-center justify-center z-1 bg-white rounded-full'>
-                  {purchaseData ? purchaseData.data.data.length : null}
+                  {cartLength}
                 </div>
               )} */}
               <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>

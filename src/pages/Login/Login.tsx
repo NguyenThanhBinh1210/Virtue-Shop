@@ -7,14 +7,15 @@ import { useMutation } from 'react-query'
 import * as yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
 import Input from 'src/components/Input'
-import { loginAccount } from 'src/apis/auth.api'
+import { loginAccount, loginWithGoogle } from 'src/apis/auth.api'
 import { toast } from 'react-toastify'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { AppContext } from 'src/contexts/app.context'
 import omit from 'lodash/omit'
 import Cookies from 'js-cookie'
 import { Helmet } from 'react-helmet'
-
+import { GoogleLogin } from 'react-google-login'
+import { gapi } from 'gapi-script'
 const schema = yup
   .object({
     email: yup.string().email('Không đúng định dạng email!').required('Chưa nhập email'),
@@ -61,17 +62,42 @@ const Login = () => {
           toast.success('Đăng nhập thành công!')
           setIsAuthenticated(true)
           navigate('/')
-          Cookies.set('refresh_token', dataUser.data.refresh_token as string)
+          // Cookies.set('refresh_token', dataUser.data.refresh_token as string)
         }
       }
     })
   }
-  // const clientId = '564948588399-db0beu2kqorqf7rcuolf4u72jf48msek.apps.googleusercontent.com'
-  // useEffect(() => {
-  //   gapi.load('client:auth2', () => {
-  //     gapi.auth2.init({ clientId: clientId })
-  //   })
-  // }, [])
+  const handleFailure = () => {
+    console.log('Chịu')
+  }
+  const clientId = '564948588399-db0beu2kqorqf7rcuolf4u72jf48msek.apps.googleusercontent.com'
+  const googleLoginMutation = useMutation((body: any) => loginWithGoogle(body))
+  const loginGoogle = (response: any) => {
+    const body = {
+      tokenId: response.tokenId,
+      clientId: clientId
+    }
+    googleLoginMutation.mutate(body, {
+      onSuccess: (data: any) => {
+        const newUser: any = omit(data.data.data, ['password', 'isAdmin'])
+        setProfile(newUser)
+        toast.success('Đăng nhập thành công!')
+        setIsAuthenticated(true)
+        navigate('/')
+      }
+    })
+  }
+
+  useEffect(() => {
+    function start() {
+      gapi.client.init({
+        clientId: clientId,
+        scope: 'profile email'
+      })
+    }
+
+    gapi.load('client:auth2', start)
+  }, [])
 
   return (
     <div className=''>
@@ -95,23 +121,17 @@ const Login = () => {
           </div>
         </div>
         <div className=''>
-          <button
-            // onClick={googleAuth}
-            className={` dark:border-[#3A3A43] flex items-center gap-x-2 w-full justify-center border rounded-md p-2 mb-[10px]`}
-          >
-            <div className='w-6 h-6'>
-              <img src={Google} alt='' />
-            </div>
-            <h1 className={`dark:text-white`}>Đăng nhập bằng Google</h1>
-          </button>
-          {/* <GoogleLogin
+          <GoogleLogin
+            className='google-btn'
             clientId={clientId}
-            onSuccess={onSuccess}
+            buttonText='Log in with Google'
+            onSuccess={loginGoogle}
+            onFailure={handleFailure}
             render={(renderProp) => (
               <button
                 disabled={renderProp.disabled}
                 onClick={renderProp.onClick}
-                className={`flex items-center gap-x-2 w-full justify-center border border-text-color rounded-md p-2 mb-[10px] dark:text-white `}
+                className={`flex items-center gap-x-2 w-full justify-center border dark:border-text-color rounded-md p-2 mb-[10px] dark:text-white `}
               >
                 <div className='w-6 h-6'>
                   <img src={Google} alt='' />
@@ -119,10 +139,10 @@ const Login = () => {
                 <h1 className={`dark:text-white`}>Đăng nhập bằng Google</h1>{' '}
               </button>
             )}
-            onFailure={onFailure}
-            cookiePolicy='single_host_origin'
-            responseType='code,token'
-          /> */}
+            scope={'profile email'}
+            cookiePolicy={'single_host_origin'}
+          ></GoogleLogin>
+          <p className='text-center text-text-color mt-4'>Hoặc đăng nhập với email</p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className='mt-[20px] '>
           <Input

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useEffect, useState } from 'react'
-import { getProfileFromLS, setProfileFromLS } from 'src/utils/auth'
+import { getProfileFromLS, setProfileFromLS, clearLS } from 'src/utils/auth'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { changePassword, getUser, updateUser } from 'src/apis/auth.api'
+import { changePassword, getUser, logout, updateUser } from 'src/apis/auth.api'
 import { User } from 'src/types/user.type'
 import { toast } from 'react-toastify'
 import Frame from '../../assets/images/Frame.jpg'
@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next'
 
 type FormStateType = Omit<User, '_id'>
 const Profile = () => {
+  const [formError, setFormError] = useState('')
   const { t } = useTranslation('profile')
   const { t: t2 } = useTranslation('cart')
   const profileAccessToken = getProfileFromLS()
@@ -29,15 +30,6 @@ const Profile = () => {
   }
   const [formState, setFormState] = useState<FormStateType>(initialFromState)
   const [passwordState, setPasswordState] = useState(initialPasswordState)
-  useEffect(() => {
-    setFormState({
-      name: profileAccessToken?.name,
-      email: profileAccessToken?.email,
-      phone: profileAccessToken?.phone,
-      address: profileAccessToken?.address,
-      avatar: profileAccessToken?.avatar
-    })
-  }, [])
 
   useQuery({
     queryKey: ['user', profileAccessToken._id],
@@ -51,13 +43,21 @@ const Profile = () => {
 
   const [isDisabled, setDisable] = useState(true)
   const [isDisabledEmail, setDisableEmail] = useState(true)
-  const { setProfile } = useContext(AppContext)
+
+  const { setProfile, reset } = useContext(AppContext)
   const updateProfileMutation = useMutation({
     mutationFn: () => {
       return updateUser(profileAccessToken._id, formState)
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['user', profileAccessToken._id], data)
+    }
+  })
+  const logOutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      reset()
+      clearLS()
     }
   })
   const changePasswordMutation = useMutation({
@@ -70,12 +70,13 @@ const Profile = () => {
       return changePassword(body)
     },
     onError: (data: any) => {
+      setFormError(data.response.data.message)
       toast.warn(data.response.data.message)
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       setDisableEmail(true)
-      console.log(data)
-      toast.success('Đã đổi mật khẩu thành công!')
+      toast.success('Đã đổi mật khẩu thành công, mời đăng nhập lại!')
+      logOutMutation.mutate()
     }
   })
   const handleChange = (name: keyof FormStateType) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,11 +84,20 @@ const Profile = () => {
   }
   const handleChangePassword = (name: any) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setPasswordState((prev) => ({ ...prev, [name]: event.target.value }))
+    setFormError('')
   }
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (passwordState.password !== '' && passwordState.newPassword !== '') {
-      changePasswordMutation.mutate()
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/
+      const isValid = regex.test(passwordState.newPassword)
+
+      if (!isValid) {
+        setFormError('Mật khẩu mới ít nhất 8 ký tự, 1 số và 1 ký tự đặc biệt!')
+      } else {
+        changePasswordMutation.mutate()
+        setPasswordState(initialPasswordState)
+      }
     }
     if (passwordState.password === '' && passwordState.newPassword === '') {
       updateProfileMutation.mutate(undefined, {
@@ -194,15 +204,17 @@ const Profile = () => {
         </div>
         <div className='font-[700] text-[18px] flex justify-between mt-[40px] mb-[20px]'>
           <h1> {t('account')}</h1>
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              setDisableEmail(!isDisabledEmail)
-            }}
-            className='text-secondary font-[600] text-[18px]'
-          >
-            {isDisabledEmail ? `${t('edit')}` : `${t('close')}`}
-          </button>
+          {formState.type !== 'google' && (
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                setDisableEmail(!isDisabledEmail)
+              }}
+              className='text-secondary font-[600] text-[18px]'
+            >
+              {isDisabledEmail ? `${t('edit')}` : `${t('close')}`}
+            </button>
+          )}
         </div>
 
         <div className='mb-6'>
@@ -216,46 +228,52 @@ const Profile = () => {
             className=' dark:bg-[#1C1C24] dark:text-text-color dark:border-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-primary block w-full p-2.5'
             placeholder='john.doe@company.com'
             required
-            value={formState.email}
+            value={formState.email?.replace('google', '')}
             onChange={handleChange('email')}
           />
         </div>
-        <div className='grid grid-cols-2 gap-x-10'>
-          <div className='mb-6'>
-            <label htmlFor='password' className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900 '>
-              {t('old password')}
-            </label>
-            <input
-              disabled={isDisabledEmail}
-              type='password'
-              id='password'
-              className=' dark:bg-[#1C1C24] dark:text-text-color dark:border-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-primary block w-full p-2.5 '
-              placeholder='•••••••••'
-              required
-              value={passwordState.password}
-              onChange={handleChangePassword('password')}
-            />
+        {formState.type !== 'google' && (
+          <div className='grid grid-cols-2 gap-x-10'>
+            <div className='mb-6'>
+              <label htmlFor='password' className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900 '>
+                {t('old password')}
+              </label>
+              <input
+                disabled={isDisabledEmail}
+                type='password'
+                id='password'
+                className={` dark:bg-[#1C1C24] dark:text-text-color dark:border-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-primary ${
+                  formError ? 'border-red-300 focus:border-red-300' : ''
+                } block w-full p-2.5 `}
+                placeholder='•••••••••'
+                required
+                value={passwordState.password}
+                onChange={handleChangePassword('password')}
+              />
+            </div>
+            <div className='mb-6'>
+              <label
+                htmlFor='confirm_password'
+                className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900'
+              >
+                {t('new password')}
+              </label>
+              <input
+                disabled={isDisabledEmail}
+                type='password'
+                id='confirm_password'
+                className={` dark:bg-[#1C1C24] dark:text-text-color dark:border-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-primary ${
+                  formError ? 'border-red-300 focus:border-red-300' : ''
+                } block w-full p-2.5 `}
+                placeholder='•••••••••'
+                required
+                value={passwordState.newPassword}
+                onChange={(event) => setPasswordState((prev) => ({ ...prev, newPassword: event.target.value }))}
+              />
+            </div>
+            <div className='text-red-300 mb-2'>{formError}</div>
           </div>
-          <div className='mb-6'>
-            <label
-              htmlFor='confirm_password'
-              className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900'
-            >
-              {t('new password')}
-            </label>
-            <input
-              disabled={isDisabledEmail}
-              type='password'
-              id='confirm_password'
-              className='dark:bg-[#1C1C24] dark:text-text-color dark:border-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-primary block w-full p-2.5  '
-              placeholder='•••••••••'
-              required
-              value={passwordState.newPassword}
-              onChange={(event) => setPasswordState((prev) => ({ ...prev, newPassword: event.target.value }))}
-            />
-          </div>
-        </div>
-
+        )}
         {/* Button */}
         <div className='flex justify-between'>
           {!isDisabled && (

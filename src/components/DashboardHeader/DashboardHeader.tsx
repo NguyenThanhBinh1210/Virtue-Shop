@@ -22,6 +22,7 @@ import { logout } from 'src/apis/auth.api'
 import { toast } from 'react-toastify'
 import useDarkMode from 'src/hooks/useDarkMode'
 import { useTranslation } from 'react-i18next'
+import Popover from '../Popover/Popover'
 
 const schema = yup
   .object({
@@ -44,7 +45,6 @@ const DashboardHeader = () => {
     resolver: yupResolver(schema)
   })
   const { profile } = useContext(AppContext)
-
   const [count, setCount] = useState(false)
   const [modal, setmModal] = useState(false)
 
@@ -78,11 +78,21 @@ const DashboardHeader = () => {
     logOutMutation.mutate()
     setCount(!count)
   }
+  const { i18n } = useTranslation()
+  const currentLanguage = i18n.language
+  const changLanguage = () => {
+    if (currentLanguage === 'vi') {
+      i18n.changeLanguage('en')
+    }
+    if (currentLanguage === 'en') {
+      i18n.changeLanguage('vi')
+    }
+  }
   return (
     <div className=''>
-      <div className='dashboardHeader flex p-8'>
+      <div className='dashboardHeader flex p-8 mobile:pb-1 mobile:flex mobile:justify-between'>
         <div className='dashboardHeader__left flex w-[50%] mobile:w-[auto] mobile:justify-between relative'>
-          <div className='dashboardHeader__left--logo mr-8 mobile:flex mobile:justify-center mobile:items-center'>
+          <div className='dashboardHeader__left--logo mr-8 mobile:mr-0 mobile:flex mobile:justify-center mobile:items-center'>
             <Link to='/'>
               <img className='mobile:hidden cursor-pointer ' src={Logo} alt='' />
             </Link>
@@ -90,14 +100,14 @@ const DashboardHeader = () => {
               onClick={() => {
                 setCount(!count)
               }}
-              className='hidden mobile:w-[20px] mobile:h-[14px] mobile:block mobile:mt-[18px]'
+              className='hidden mobile:w-[20px] mobile:h-[14px] mobile:block'
             >
               <img alt='' src={Bar} />
             </button>
           </div>
           <form
             onSubmit={onSubmitSearch}
-            className={`cursor-pointer dark:bg-[#1C1C24] mobile:w-[217px] mobile:h-[40px] mobile:top-2 mobile:left-[50px] dashboardHeader__left--search flex items-center absolute z-10 bg-textColorwhite rounded-full w-[430px] h-[46px] p-1 pl-3 lr-2 left-[20%] top-1 shadow `}
+            className={`cursor-pointer dark:bg-[#1C1C24] mobile:w-[217px] mobile:h-[40px] mobile:left-[50px] dashboardHeader__left--search flex items-center absolute z-10 bg-textColorwhite rounded-full w-[430px] h-[46px] p-1 pl-3 lr-2 left-[20%] top-1 mobile:top-0 shadow `}
           >
             <input
               type='text'
@@ -105,7 +115,10 @@ const DashboardHeader = () => {
               placeholder={t('search name') || ''}
               {...register('name')}
             />
-            <button className='bg-bgPrimary w-[72px] h-[40px] rounded-full  flex mobile:w-[42px] mobile:h-[28px]'>
+            <button
+              type='submit'
+              className='bg-bgPrimary w-[72px] h-[40px] rounded-full  flex mobile:w-[42px] mobile:h-[28px]'
+            >
               <img
                 alt=''
                 src={Search}
@@ -115,7 +128,7 @@ const DashboardHeader = () => {
             </button>
           </form>
         </div>
-        <div className='dashboardHeader__right flex items-center w-[50%] justify-end mobile:justify-start'>
+        <div className='mobile:hidden dashboardHeader__right flex items-center w-[50%] justify-end mobile:justify-start'>
           <div className='cursor-pointer dashboardHeader__right--start mobile:hidden'>
             <div className='flex gap-x-6'>
               <Link to='/product'>
@@ -127,11 +140,37 @@ const DashboardHeader = () => {
             </div>
           </div>
           {isAuthenticated ? (
-            <div className='dashboardHeader__right--avatar ml-4 cursor-pointer'>
-              <div className=' w-[52px] rounded-full overflow-hidden  h-[52px] mobile:w-[40px] mobile:h-[40px] mobile:ml-8 flex items-center justify-center mobile:absolute mobile:right-4 mobile:top-[40px]'>
-                {profile?.avatar ? <img src={profile?.avatar} alt='' /> : <img alt='' className='' src={Frame} />}
-                {/* <img alt='' className='' src={Frame} /> */}
+            <div className='dashboardHeader__right--avatar ml-4 mobile:ml-0 cursor-pointer'>
+              <div className=' w-[52px] rounded-full overflow-hidden  h-[52px] mobile:w-[40px] mobile:h-[40px] flex items-center justify-center mobile:absolute mobile:right-4 mobile:top-[40px]'>
+                {profile?.avatar ? <img src={profile.avatar} alt='' /> : <img alt='' className='' src={Frame} />}
               </div>
+            </div>
+          ) : (
+            ''
+          )}
+        </div>
+        <div className='gap-x-6 mobile:gap-x-0 hidden mobile:flex'>
+          <Popover
+            renderPopover={
+              <div className='relative p-4 max-w-[400px] rounded-md border  bg-white text-sm shadow-md'>
+                <Link to='/login' className={`${isAuthenticated ? 'hidden' : ''}`}>
+                  <button className='bg-primary p-2 text-white rounded-md'>{t('login')}</button>
+                </Link>
+              </div>
+            }
+            placement='bottom'
+          >
+            <div className=' w-[52px] rounded-full overflow-hidden  h-[52px] mobile:w-[40px] mobile:h-[40px] mobile:ml-8 flex items-center justify-center '>
+              <img alt='' className='' src={Frame} />
+            </div>
+          </Popover>
+          {isAuthenticated ? (
+            <div className=' ml-4 mobile:ml-[0px] cursor-pointer'>
+              <Link to='/profile'>
+                <div className=' w-[52px] rounded-full overflow-hidden  h-[52px] mobile:w-[40px] mobile:h-[40px] mobile:ml-8 flex items-center justify-center '>
+                  {profile?.avatar ? <img src={profile?.avatar} alt='' /> : <img alt='' className='' src={Frame} />}
+                </div>
+              </Link>
             </div>
           ) : (
             ''
@@ -155,21 +194,18 @@ const DashboardHeader = () => {
           count ? 'translate-x-0' : 'translate-x-[-100%]'
         } transition-transform dark:bg-[#1C1C24] pt-10 w-[400px] h-[100vh] bg-white fixed z-[1000] top-0 hidden mobile:block `}
       >
-        <div className='dasboardHeader__mobile  flex  items-center justify-around'>
-          <div className='dasboardHeader__mobile--logo w-[40px] h-[40px]'>
+        <div className='dasboardHeader__mobile  flex  items-center justify-between px-10'>
+          <button
+            onClick={() => {
+              setCount(!count)
+              navigate('/')
+            }}
+            className='dasboardHeader__mobile--logo w-[40px] h-[40px]'
+          >
             <img src={Logo} className='w-10 h-10' alt='' />
-          </div>
-          <div>
-            <Link
-              to={isAuthenticated ? '/product' : '/login'}
-              onClick={() => {
-                setCount(!count)
-              }}
-            >
-              <Button>{isAuthenticated ? ' Go shopping' : 'Go to login'}</Button>
-            </Link>
-          </div>
-          <div className='dashboardHeader__left--logo mr-8 mobile:flex mobile:justify-center mobile:items-center'>
+          </button>
+
+          <div className='dashboardHeader__left--logo mobile:flex mobile:justify-center mobile:items-center'>
             <button
               onClick={() => {
                 setCount(!count)
@@ -180,13 +216,13 @@ const DashboardHeader = () => {
             </button>
           </div>
         </div>
-        <div className='dasboardHeader__mobile p-10 '>
+        <div className='dasboardHeader__mobile px-10 py-3 '>
           <button onClick={() => setCount(!count)}>
-            <Link to='/' className='dasboardHeader__mobile--container w-[327px] h-[52px] flex items-center'>
+            <Link to='/product/' className='dasboardHeader__mobile--container w-[327px] h-[52px] flex items-center'>
               <div>
                 <img alt='' className='w-[24px] h-[24px]' src={Dashboard} />
               </div>
-              <p className='ml-5 text-iconColor lg-iconColor text-sm mr-1'>{t2('homes')}</p>
+              <p className='ml-5 text-iconColor lg-iconColor text-sm mr-1'>{t('go shopping')}</p>
             </Link>
           </button>
           <button onClick={() => setCount(!count)}>
@@ -230,6 +266,15 @@ const DashboardHeader = () => {
             <p className='ml-5 text-iconColor text-sm  mr-1'>{t2('logout')}</p>
           </button>
           <button
+            onClick={changLanguage}
+            className='text-[#A2A2A8]  text-[20px] dasboardHeader__mobile--container w-[327px] h-[52px] flex items-center'
+          >
+            {currentLanguage.toLocaleUpperCase()}
+            <p className='ml-5 text-iconColor text-sm  mr-1'>
+              {currentLanguage === 'vi' ? 'Tiếng việt' : currentLanguage === 'en' ? 'English' : ''}
+            </p>
+          </button>
+          <button
             className=' dasboardHeader__mobile--container w-[327px] gap-x-5 h-[52px] flex items-center '
             onClick={() => toggleDarkMode(!isDarkMode)}
           >
@@ -248,9 +293,7 @@ const DashboardHeader = () => {
                 />
               </svg>
             )}
-            <h1 className='text-iconColor dark:text-text-color font-[600]'>
-              {isDarkMode ? `${t2('dark')}` : `${t2('light')}`}
-            </h1>
+            <h1 className='text-iconColor dark:text-text-color ]'>{isDarkMode ? `${t2('dark')}` : `${t2('light')}`}</h1>
           </button>
         </div>
       </div>

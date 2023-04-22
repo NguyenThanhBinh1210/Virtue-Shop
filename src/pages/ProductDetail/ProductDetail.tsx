@@ -43,7 +43,7 @@ const ProductDetail = () => {
   const product = productDetailData?.data.data
   const queryConfig = {
     page: 1,
-    limit: 3,
+    limit: 5,
     category: product?.category
   }
   const { data: productsSimilarData } = useQuery({
@@ -59,7 +59,7 @@ const ProductDetail = () => {
     queryFn: () => {
       return getProduct({
         page: 1,
-        limit: 4
+        limit: 6
       })
     },
     enabled: Boolean(product),
@@ -141,11 +141,14 @@ const ProductDetail = () => {
           <section className='mb-[20px] mobile:w-[327px] dark:text-white '>
             <h1 className='font-[600] text-[18px] leading-7 mb-[20px]'>{t2('latest products')}</h1>
             <div className='gap-[30px] grid grid-cols-4 mobile:flex mobile:w-[100%] mobile:overflow-x-auto'>
-              {products?.map((item) => (
-                <div key={item._id}>
-                  <ProductItem product={item} />
-                </div>
-              ))}
+              {products
+                ?.filter((item: any) => item._id !== product._id)
+                .slice(0, 4)
+                .map((item) => (
+                  <div key={item._id}>
+                    <ProductItem product={item} />
+                  </div>
+                ))}
             </div>
           </section>
         </div>

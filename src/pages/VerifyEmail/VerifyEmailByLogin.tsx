@@ -4,12 +4,42 @@ import { useMutation } from 'react-query'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import OtpInput from 'react18-input-otp'
-import { deleteOtp, registerAccount, verifyAccount } from 'src/apis/auth.api'
+import { deleteOtp, getOtpTimer, registerAccount, verifyAccount } from 'src/apis/auth.api'
 const VerifyEmailByLogin = () => {
   const location = useLocation()
-  const [count, setCount] = useState(Number(localStorage.getItem('count')) || 60)
   const registerForm = location.state?.registerForm
   const [otp, setOtp] = useState('')
+  const [time, setTime] = useState<number>(0)
+  const [emailState, setEmailState] = useState<string>(registerForm.email)
+  const getTimer = useMutation({
+    mutationFn: () => {
+      const body: any = { user_email: emailState }
+      return getOtpTimer(body)
+    },
+    onSuccess: (data) => {
+      const dataNumber = Math.floor(data.data.timer)
+      setTime(dataNumber)
+    }
+  })
+  const deleteMutation = useMutation({
+    mutationFn: () => {
+      return deleteOtp(registerForm.email)
+    }
+  })
+  useEffect(() => {
+    if (emailState !== '') {
+      const timer = setTimeout(() => {
+        getTimer.mutate()
+      }, 1000)
+      if (time < 0) {
+        setEmailState('')
+        clearTimeout(timer)
+      }
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+  })
   const navigate = useNavigate()
   const handleChange = (enteredOtp: any) => {
     setOtp(enteredOtp)
@@ -29,50 +59,30 @@ const VerifyEmailByLogin = () => {
   })
   const resendOtpMutation = useMutation({
     mutationFn: () => {
-      return verifyAccount(registerForm)
+      const body = {
+        email: emailState
+      }
+      return verifyAccount(body)
     },
     onSuccess: () => {
       toast.success('Đã gửi lại OTP!')
     }
   })
-  const backMutation = useMutation({
-    mutationFn: () => {
-      return deleteOtp(registerForm.email)
-    }
-  })
+
   const handleVerify = () => {
     registerMutation.mutate()
   }
 
   const handleReSendOtp = () => {
-    localStorage.setItem('count', '60')
-    setCount(Number(localStorage.getItem('count')))
-    setOtp('')
     resendOtpMutation.mutate()
+    setOtp('')
+    setEmailState(registerForm.email)
   }
   const handleBack = () => {
-    localStorage.removeItem('temp')
-    navigate('/register')
-    backMutation.mutate()
+    navigate(-1)
+    deleteMutation.mutate()
   }
 
-  // Timeout
-  const isDisable = Boolean(count)
-  useEffect(() => {
-    let timer: string | number | NodeJS.Timeout | undefined
-    if (count > 0) {
-      timer = setTimeout(() => {
-        localStorage.setItem('count', String(count - 1))
-        setCount(Number(localStorage.getItem('count')))
-      }, 1000)
-    } else {
-      localStorage.removeItem('count')
-      setCount(0)
-    }
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [count])
   return (
     <div className='mx-auto w-[455px] dark:bg-[#1C1C24] mobile:w-full shadow-lg rounded-lg px-[35px] py-[50px] '>
       <h1 className='font-[700] text-[25px] mb-[25px] dark:text-white'>Email Verification</h1>
@@ -99,17 +109,13 @@ const VerifyEmailByLogin = () => {
         />
         <div className='flex gap-x-2 items-center mt-[20px]'>
           <button
-            disabled={isDisable}
+            disabled={time <= 0 ? false : true}
             onClick={handleReSendOtp}
-            className='disabled:opacity-50 font-[600] text-[14px] flex gap-x-[10px] leading-6 text-secondary'
+            className='disabled:opacity-75 font-[600] text-[14px] flex gap-x-[10px] leading-6 text-secondary'
           >
             Resend OTP
           </button>
-          {count !== 0 && (
-            <div className='dark:text-white'>
-              {count >= 60 ? '01' : '00'}:{count < 10 ? `0${count}` : count >= 60 ? '00' : count}
-            </div>
-          )}
+          <span>00:{time >= 10 ? time : `0${time}`}</span>
         </div>
         <button
           onClick={handleVerify}

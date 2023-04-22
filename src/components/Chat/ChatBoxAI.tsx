@@ -1,18 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FormEvent, useContext, useEffect, useState } from 'react'
+import { FormEvent, useContext, useState } from 'react'
 import { AppContext } from 'src/contexts/app.context'
 import Frame from 'src/assets/images/Frame.jpg'
 import { useMutation } from 'react-query'
 import { chatWithBot } from 'src/apis/chat.api'
 import BotImg from 'src/assets/images/bot.png'
-import { FormatNumber } from 'src/hooks/useFormatNumber'
+import { FormatNumber, generateNameId } from 'src/hooks/useFormatNumber'
 import { Link } from 'react-router-dom'
-import { generateNameId } from 'src/hooks/useFormatNumber'
+
 const ChatBoxAI = () => {
   const [toggleChatBox, setToggleChatBox] = useState<boolean>(true)
-  const [valueInput, setValueInput] = useState<string>()
+  const [valueInput, setValueInput] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
-  // console.log(formChat)
   const data = [
     {
       id: 1,
@@ -24,14 +23,13 @@ const ChatBoxAI = () => {
   ]
   const { profile } = useContext(AppContext)
 
-  const chatInLS = JSON.parse(localStorage.getItem('chat') || '{}')
+  // const chatInLS = JSON.parse(localStorage.getItem('chat') || '{}')
   const [chatState, setChatState] = useState(data)
   const chatMutation = useMutation({
     mutationFn: (body: any) => {
       return chatWithBot(body)
     },
     onSuccess: (data) => {
-      console.log(data.data.dataProduct)
       setChatState([
         ...chatState,
         {
@@ -42,23 +40,12 @@ const ChatBoxAI = () => {
           dataProduct: data.data.dataProduct ? data.data.dataProduct : []
         }
       ])
-      // localStorage.setItem(
-      //   'chat',
-      //   JSON.stringify([
-      //     ...chatState,
-      //     {
-      //       id: Math.random(),
-      //       userId: 'bot',
-      //       text: data.data.message
-      //     }
-      //   ])
-      // )
     }
   })
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    if (valueInput) {
+    if (valueInput !== '') {
       setValueInput('')
       setChatState([
         ...chatState,
@@ -70,17 +57,6 @@ const ChatBoxAI = () => {
           dataProduct: []
         }
       ])
-      // localStorage.setItem(
-      //   'chat',
-      //   JSON.stringify([
-      //     ...chatState,
-      //     {
-      //       id: Math.random(),
-      //       userId: 'binh',
-      //       text: valueInput
-      //     }
-      //   ])
-      // )
       setTimeout(() => {
         const body = { question: valueInput }
         chatMutation.mutate(body)
@@ -90,10 +66,10 @@ const ChatBoxAI = () => {
   }
 
   return (
-    <div className='fixed bottom-10 right-10'>
+    <div className='fixed bottom-10 right-10 mobile:bottom-5 mobile:right-5'>
       <div
         className={`${
-          toggleChatBox ? 'opacity-0 invisible w-0 h-0' : 'opacity-100 visible w-auto h-auto'
+          toggleChatBox ? 'boxchat opacity-0 invisible w-0 h-0' : 'opacity-100 visible w-auto h-auto'
         } transition ease-in-out rounded-md duration-150 shadow-2xl mb-4 max-w-[360px] w-full bg-secondary`}
       >
         <div className='p-4 text-white'>

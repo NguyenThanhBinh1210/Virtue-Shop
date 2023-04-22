@@ -14,6 +14,7 @@ const PaymentSuccess = () => {
     queryKey: ['purchaseOnline'],
     queryFn: () => getPurchasesOnline(queryParams.orderInfo)
   })
+
   const dataPurchases = purchaseOnlineData?.data.data
   const buyPurchaseMutation = useMutation({
     mutationFn: (body: any) => {
@@ -26,13 +27,16 @@ const PaymentSuccess = () => {
 
   useEffect(() => {
     const id = setTimeout(() => {
+      const shippingAddress = JSON.parse(localStorage.getItem('shipping') || '{}')
       const bodyData = dataPurchases.map((item: any) => {
         return {
           product_id: item.product._id,
           buy_count: item.buy_count
         }
       })
-      buyPurchaseMutation.mutate({ body: bodyData, paymentMethods: 1 })
+      if (shippingAddress) {
+        buyPurchaseMutation.mutate({ body: bodyData, paymentMethods: 1, shippingAddress: shippingAddress })
+      }
     }, 1000)
     return () => {
       clearTimeout(id)

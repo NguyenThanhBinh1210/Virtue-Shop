@@ -4,12 +4,50 @@ import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { changeStatusPurchase, getPurchases } from 'src/apis/purchase.api'
+import { cancelBuy, changeStatusPurchase, getPurchases } from 'src/apis/purchase.api'
 import { purchasesStatus } from 'src/constants/perchase'
 import { FormatNumber, generateNameId } from 'src/hooks/useFormatNumber'
 import { getProfileFromLS } from 'src/utils/auth'
+import Modal from 'react-modal'
+import React from 'react'
+
 const UserOrder = () => {
   const { t } = useTranslation('cart')
+  const reasonList = [
+    { value: 1, display: t('change address') },
+    { value: 2, display: t('change purchase') },
+    { value: 3, display: t('pay method bad') },
+    { value: 4, display: t('see new shop') },
+    { value: 5, display: t('change your mind') },
+    { value: 6, display: t('different') }
+  ]
+  const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)'
+    }
+  }
+  let subtitle: any
+  const [modalIsOpen, setIsOpen] = React.useState(false)
+  const [valueReason, setValueReason] = React.useState<string>('')
+  const [idPurchase, setIdPurchase] = React.useState<string>()
+  function openModal(id: string) {
+    setIsOpen(true)
+    setIdPurchase(id)
+  }
+
+  function afterOpenModal() {
+    subtitle.style.color = '#f00'
+  }
+
+  function closeModal() {
+    setIsOpen(false)
+  }
+
   const profileAccessToken = getProfileFromLS()
   const queryClient = useQueryClient()
   const { data: purchaseData, isLoading } = useQuery({
@@ -35,6 +73,17 @@ const UserOrder = () => {
       toast.success('Đã nhận hàng!')
     }
   })
+  const cancelBuyMutation = useMutation({
+    mutationFn: (body: any) => {
+      return cancelBuy(profileAccessToken?._id, body)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['purchases-wait', profileAccessToken?._id])
+    },
+    onError: (error: any) => {
+      toast.warn(error?.response.data.message)
+    }
+  })
   const handleConfirm = (productId: string, purchaseId: string, status: number) => {
     const body: any = { product_id: productId, purchase_id: purchaseId, status: status }
     updatePurchaseMutation.mutate(body, {
@@ -45,7 +94,7 @@ const UserOrder = () => {
   }
   return (
     <div>
-      <h1 className='font-[700] mobile:px-[20px] text-[24px] dark:text-white'>{t('order status')}</h1>
+      <h1 className='font-[700] mobile:px-[20px] text-[24px] dark:text-white mb-7 mobile:mb-0'>{t('order status')}</h1>
       {isLoading && (
         <div className='text-center mt-20'>
           <div role='status'>
@@ -72,7 +121,7 @@ const UserOrder = () => {
       {!isLoading && (
         <div className='dark:text-text-color dark:mt-5 '>
           <div className='mobile:px-6'>
-            <div className='flex mb-7'></div>
+            {/* <div className='flex mb-7'></div> */}
             <div className='w-[100%] '>
               <table className='product-list dark:bg-[#1C1C24] dark:rounded-lg shadow-md'>
                 <thead className='mobile:hidden'>
@@ -111,13 +160,30 @@ const UserOrder = () => {
                           <td>{FormatNumber(purchase.product.price_after_discount * purchase.buy_count)}đ</td>
                           <td>
                             {purchase?.status === 1 && (
-                              <button className='text-yellow-500'>{t('wait for confirmation')}</button>
+                              <span className='bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-yellow-900 dark:text-yellow-300'>
+                                {t('wait for confirmation')}
+                              </span>
                             )}
-                            {purchase?.status === 3 && <button className='text-blue-400'>{t('in progress')}</button>}
+                            {purchase?.status === 3 && (
+                              <span className='bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-blue-900 dark:text-blue-300'>
+                                {t('in progress')}
+                              </span>
+                            )}
                             {purchase?.status === 2 && (
-                              <button className='text-pink-400'>{t('wait for getting')}</button>
+                              <span className='bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-green-900 dark:text-green-300'>
+                                {t('wait for getting')}
+                              </span>
                             )}
-                            {purchase?.status === 4 && <button className='text-primary'>{t('delivered')}</button>}
+                            {purchase?.status === 4 && (
+                              <span className='bg-purple-100 text-purple-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-purple-900 dark:text-purple-300'>
+                                {t('delivered')}
+                              </span>
+                            )}
+                            {purchase?.status === 5 && (
+                              <span className='bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-gray-700 dark:text-gray-300'>
+                                {t('cancelled')}
+                              </span>
+                            )}
                           </td>
                           <td>
                             {purchase?.status === 4 && (
@@ -158,14 +224,24 @@ const UserOrder = () => {
                                 {t('confirm')}
                               </button>
                             )}
-                            {purchase?.status !== 2 && purchase?.status !== 4 && (
+                            {purchase?.status !== 2 && purchase?.status !== 4 && purchase?.status !== 5 && (
                               <button
-                                onClick={() => {
-                                  toast.warn('Đặt hàng xin đừng boom mà!')
-                                }}
+                                onClick={() => openModal(purchase._id)}
                                 className='hover:translate-x-0.5 hover:-translate-y-0.5 transition-all'
                               >
                                 {t('cancel')}
+                              </button>
+                            )}
+                            {purchase?.status === 5 && (
+                              <button className='text-secondary hover:translate-x-0.5 hover:-translate-y-0.5 transition-all'>
+                                <Link
+                                  to={`/product/${generateNameId({
+                                    name: purchase.product?.name,
+                                    id: purchase.product?._id
+                                  })}`}
+                                >
+                                  {t('buy again')}
+                                </Link>
                               </button>
                             )}
                           </td>
@@ -191,8 +267,8 @@ const UserOrder = () => {
                           <img src={purchase.product.image[0]} alt='' />
                         </div>
                       </Link>
-                      <div className='w-[60%] grid gap-y-2'>
-                        <div className='mr-4 w-full'>{purchase.product.name}</div>
+                      <div className='w-[60%] grid gap-y-3'>
+                        <div className='mr-4 w-full line-clamp'>{purchase.product.name}</div>
                         <div>
                           {FormatNumber(
                             Math.ceil(
@@ -204,11 +280,30 @@ const UserOrder = () => {
                         </div>
                         <div>
                           {purchase?.status === 1 && (
-                            <button className='text-yellow-500'>{t('wait for confirmation')}</button>
+                            <span className='bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-yellow-900 dark:text-yellow-300'>
+                              {t('wait for confirmation')}
+                            </span>
                           )}
-                          {purchase?.status === 3 && <button className='text-blue-400'>{t('in progress')}</button>}
-                          {purchase?.status === 2 && <button className='text-pink-400'>{t('wait for getting')}</button>}
-                          {purchase?.status === 4 && <button className='text-primary'>{t('delivered')}</button>}
+                          {purchase?.status === 3 && (
+                            <span className='bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-blue-900 dark:text-blue-300'>
+                              {t('in progress')}
+                            </span>
+                          )}
+                          {purchase?.status === 2 && (
+                            <span className='bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-green-900 dark:text-green-300'>
+                              {t('wait for getting')}
+                            </span>
+                          )}
+                          {purchase?.status === 4 && (
+                            <span className='bg-purple-100 text-purple-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-purple-900 dark:text-purple-300'>
+                              {t('delivered')}
+                            </span>
+                          )}
+                          {purchase?.status === 5 && (
+                            <span className='bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-1.5 rounded dark:bg-gray-700 dark:text-gray-300'>
+                              {t('cancelled')}
+                            </span>
+                          )}
                         </div>
                         <div>
                           {purchase?.status === 4 && (
@@ -249,7 +344,7 @@ const UserOrder = () => {
                               {t('confirm')}
                             </button>
                           )}
-                          {purchase?.status !== 2 && purchase?.status !== 4 && (
+                          {purchase?.status !== 2 && purchase?.status !== 4 && purchase?.status !== 5 && (
                             <button
                               onClick={() => {
                                 toast.warn('Đặt hàng xin đừng boom mà!')
@@ -257,6 +352,18 @@ const UserOrder = () => {
                               className='hover:translate-x-0.5 hover:-translate-y-0.5 transition-all'
                             >
                               {t('cancel')}
+                            </button>
+                          )}
+                          {purchase?.status === 5 && (
+                            <button className='text-secondary hover:translate-x-0.5 hover:-translate-y-0.5 transition-all'>
+                              <Link
+                                to={`/product/${generateNameId({
+                                  name: purchase.product?.name,
+                                  id: purchase.product?._id
+                                })}`}
+                              >
+                                {t('buy again')}
+                              </Link>
                             </button>
                           )}
                         </div>
@@ -278,6 +385,70 @@ const UserOrder = () => {
           </div>
         </div>
       )}
+      <div className='dark:bg-slate-600'>
+        <Modal
+          isOpen={modalIsOpen}
+          onAfterOpen={afterOpenModal}
+          onRequestClose={closeModal}
+          ariaHideApp={false}
+          style={customStyles}
+          // className={`dark:bg-slate-600`}
+          contentLabel='Example Modal'
+        >
+          <div className='flex justify-between items-center'>
+            <div></div>
+            <h2 className='font-bold text-[16px]'>Chọn lý do huỷ</h2>
+            <button onClick={closeModal}>
+              <svg width={45} height={45} viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                <rect width={48} height={48} fill='white' fillOpacity='0.01' />
+                <path d='M14 14L34 34' stroke='#333' strokeWidth={1} strokeLinecap='round' strokeLinejoin='round' />
+                <path d='M14 34L34 14' stroke='#333' strokeWidth={1} strokeLinecap='round' strokeLinejoin='round' />
+              </svg>
+            </button>
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              const body = {
+                reason: valueReason,
+                purchase_id: idPurchase
+              }
+              e.preventDefault()
+              setIsOpen(false)
+              cancelBuyMutation.mutate(body)
+            }}
+          >
+            <ul className=' text-sm font-medium text-gray-900 bg-white  rounded-lg  dark:border-gray-600 dark:text-white'>
+              {reasonList.map((item, index) => (
+                <li key={item.value} className='w-full rounded-t-lg dark:border-gray-600'>
+                  <div className='flex items-center pl-3'>
+                    <input
+                      id={`list-radio-passport ${index}`}
+                      type='radio'
+                      name='list-radio'
+                      value={item.value}
+                      onChange={() => setValueReason(item.display)}
+                      className='w-4 h-4 text-red-600 bg-gray-100 border-gray-300  dark:bg-gray-600 dark:border-gray-500'
+                    />
+                    <label
+                      htmlFor={`list-radio-passport ${index}`}
+                      className='w-full py-3 ml-2 text-sm font-medium text-gray-900'
+                    >
+                      {item.display}
+                    </label>
+                  </div>
+                </li>
+              ))}
+              <button
+                type='submit'
+                className={`bg-primary text-4 font-[600]  text-white h-[52px] rounded-[10px]  w-[100%] hover:opacity-90`}
+              >
+                {t('ok')}
+              </button>
+            </ul>
+          </form>
+        </Modal>
+      </div>
     </div>
   )
 }

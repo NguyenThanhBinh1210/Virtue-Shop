@@ -33,5 +33,14 @@
   "buy again": "Mua lại",
   "evaluate": "Đánh giá",
   "cancel": "Huỷ",
-  "confirm": "Đã nhận"
+  "confirm": "Đã nhận",
+  "cancelled": "Đã huỷ",
+  "ok": "Xác nhận",
+  "change address": "Muốn thay đổi địa chỉ giao hàng",
+  "change purchase": "Muốn thay đổi sản phẩm trong đơn (size, màu sắc, số lượng,...)",
+  "pay method bad": "Thủ tục thanh toán quá rắc rối",
+  "see new shop": "Tìm thấy giá rẻ hơn ở chỗ khác",
+  "change your mind": "Đổi ý không muốn mua nữa",
+  "different": "Khác",
+  "city": "Thành phố"
 }

@@ -3,22 +3,21 @@ import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 import { AppContext } from './contexts/app.context'
 import DashboardLayout from './layouts/DashboardLayout/DashboardLayout'
 import RegisterLayout from './layouts/RegisterLayout'
-import Cart from './pages/Cart'
-import Dashboard from './pages/Dashboard'
-import Evaluate from './pages/Evaluate/Evaluate'
-// import Login from './pages/Login'
-import NotFound from './pages/NotFound/NotFound'
-import UserOrder from './pages/Order/UserOrder'
-import PaymentSuccess from './pages/PaymentSuccess/PaymentSuccess'
-import ProductDetail from './pages/ProductDetail'
-import ProductList from './pages/ProductList'
-import Profile from './pages/Profile'
-import Register from './pages/Register'
-import ResetPassword from './pages/ResetPassword/ResetPassword'
-import VerifyEmailByForgotPass from './pages/VerifyEmail/VerifyEmailByForgotPass'
-import VerifyEmailByLLogin from './pages/VerifyEmail/VerifyEmailByLogin'
 
 const Login = lazy(() => import('./pages/Login'))
+const Cart = lazy(() => import('./pages/Cart'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Evaluate = lazy(() => import('./pages/Evaluate/Evaluate'))
+const NotFound = lazy(() => import('./pages/NotFound/NotFound'))
+const UserOrder = lazy(() => import('./pages/Order/UserOrder'))
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess/PaymentSuccess'))
+const ProductDetail = lazy(() => import('./pages/ProductDetail'))
+const ProductList = lazy(() => import('./pages/ProductList'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Register = lazy(() => import('./pages/Register'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword/ResetPassword'))
+const VerifyEmailByForgotPass = lazy(() => import('./pages/VerifyEmail/VerifyEmailByForgotPass'))
+const VerifyEmailByLLogin = lazy(() => import('./pages/VerifyEmail/VerifyEmailByLogin'))
 function ProtecedRoute() {
   const { isAuthenticated } = useContext(AppContext)
   return isAuthenticated ? <Outlet /> : <Navigate to='login' />
@@ -39,7 +38,9 @@ const useRouteElements = () => {
       index: true,
       element: (
         <DashboardLayout>
-          <Dashboard />
+          <Suspense>
+            <Dashboard />
+          </Suspense>
         </DashboardLayout>
       )
     },
@@ -51,7 +52,9 @@ const useRouteElements = () => {
           path: '/profile',
           element: (
             <DashboardLayout>
-              <Profile />
+              <Suspense>
+                <Profile />
+              </Suspense>
             </DashboardLayout>
           )
         },
@@ -59,7 +62,9 @@ const useRouteElements = () => {
           path: '/cart',
           element: (
             <DashboardLayout>
-              <Cart />
+              <Suspense>
+                <Cart />
+              </Suspense>
             </DashboardLayout>
           )
         },
@@ -67,7 +72,9 @@ const useRouteElements = () => {
           path: '/order',
           element: (
             <DashboardLayout>
-              <UserOrder />
+              <Suspense>
+                <UserOrder />
+              </Suspense>
             </DashboardLayout>
           )
         },
@@ -75,7 +82,9 @@ const useRouteElements = () => {
           path: '/evaluate',
           element: (
             <DashboardLayout>
-              <Evaluate />
+              <Suspense>
+                <Evaluate />
+              </Suspense>
             </DashboardLayout>
           )
         }
@@ -99,7 +108,9 @@ const useRouteElements = () => {
           path: 'register',
           element: (
             <RegisterLayout>
-              <Register />
+              <Suspense>
+                <Register />
+              </Suspense>
             </RegisterLayout>
           )
         },
@@ -107,7 +118,9 @@ const useRouteElements = () => {
           path: 'forgot-password',
           element: (
             <RegisterLayout>
-              <VerifyEmailByForgotPass />
+              <Suspense>
+                <VerifyEmailByForgotPass />
+              </Suspense>
             </RegisterLayout>
           )
         },
@@ -115,7 +128,9 @@ const useRouteElements = () => {
           path: 'reset-password',
           element: (
             <RegisterLayout>
-              <ResetPassword />
+              <Suspense>
+                <ResetPassword />
+              </Suspense>
             </RegisterLayout>
           )
         },
@@ -127,7 +142,9 @@ const useRouteElements = () => {
               path: 'verify',
               element: (
                 <RegisterLayout>
-                  <VerifyEmailByLLogin />
+                  <Suspense>
+                    <VerifyEmailByLLogin />
+                  </Suspense>
                 </RegisterLayout>
               )
             }
@@ -139,7 +156,9 @@ const useRouteElements = () => {
       path: '/product',
       element: (
         <DashboardLayout>
-          <ProductList />
+          <Suspense>
+            <ProductList />
+          </Suspense>
         </DashboardLayout>
       )
     },
@@ -147,19 +166,29 @@ const useRouteElements = () => {
       path: '/product/:id',
       element: (
         <DashboardLayout>
-          <ProductDetail />
+          <Suspense>
+            <ProductDetail />
+          </Suspense>
         </DashboardLayout>
       )
     },
     {
       path: '/payment-success',
       index: true,
-      element: <PaymentSuccess></PaymentSuccess>
+      element: (
+        <Suspense>
+          <PaymentSuccess />
+        </Suspense>
+      )
     },
     {
       path: '*',
       index: true,
-      element: <NotFound></NotFound>
+      element: (
+        <Suspense>
+          <NotFound></NotFound>
+        </Suspense>
+      )
     }
   ])
   return routeElements

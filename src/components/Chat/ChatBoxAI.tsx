@@ -66,7 +66,7 @@ const ChatBoxAI = () => {
   }
 
   return (
-    <div className='fixed bottom-10 right-10'>
+    <div className='fixed bottom-10 right-10 mobile:bottom-5 mobile:right-5'>
       <div
         className={`${
           toggleChatBox ? 'boxchat opacity-0 invisible w-0 h-0' : 'opacity-100 visible w-auto h-auto'

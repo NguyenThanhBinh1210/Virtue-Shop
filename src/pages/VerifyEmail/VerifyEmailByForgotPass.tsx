@@ -1,28 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation } from 'react-query'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import OtpInput from 'react18-input-otp'
-import { verifyAccount } from 'src/apis/auth.api'
-import Countdown from 'react-countdown'
+import { deleteOtp, getOtpTimer, verifyAccount } from 'src/apis/auth.api'
 
-interface TimeType {
-  hours: any
-  minutes: any
-  seconds: any
-  completed: any
-}
 const VerifyEmailByForgotPass = () => {
   const [showOTPField, setShowOTPField] = useState(false)
-
   const [emailState, setEmailState] = useState<string>('')
+
   const navigate = useNavigate()
   const [otp, setOtp] = useState('')
-
+  const [time, setTime] = useState<number>(0)
   const handleChange = (enteredOtp: any) => {
     setOtp(enteredOtp)
   }
+  const getTimer = useMutation({
+    mutationFn: () => {
+      const body: any = { user_email: emailState }
+      return getOtpTimer(body)
+    },
+    onSuccess: (data) => {
+      const dataNumber = Math.floor(data.data.timer)
+      setTime(dataNumber)
+    }
+  })
+  const deleteMutation = useMutation({
+    mutationFn: () => {
+      return deleteOtp(emailState)
+    }
+  })
+  useEffect(() => {
+    if (emailState !== '') {
+      const timer = setTimeout(() => {
+        getTimer.mutate()
+      }, 1000)
+      if (time < 0) {
+        setEmailState('')
+        clearTimeout(timer)
+      }
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+  })
   const resendOtpMutation = useMutation({
     mutationFn: () => {
       const body = {
@@ -53,33 +75,10 @@ const VerifyEmailByForgotPass = () => {
     e.preventDefault()
     resendOtpMutation.mutate()
   }
-  const Completionist = () => (
-    <button
-      onClick={handleReSendOtp}
-      className='font-[600] mt-[20px] text-[14px] flex gap-x-[10px] leading-6 text-secondary'
-    >
-      Resend OTP
-    </button>
-  )
-  const renderer = ({ hours, minutes, seconds, completed }: TimeType) => {
-    if (completed) {
-      // Render a completed state
-      return <Completionist />
-    } else {
-      return (
-        <div className='flex items-center mt-[20px] gap-x-3'>
-          <button
-            disabled
-            className='disabled:opacity-75 font-[600] text-[14px] flex gap-x-[10px] leading-6 text-secondary'
-          >
-            Resend OTP
-          </button>
-          <span>
-            {minutes}:{seconds}
-          </span>
-        </div>
-      )
-    }
+
+  const handleBack = () => {
+    navigate('/login')
+    deleteMutation.mutate()
   }
   return (
     <div className='mx-auto dark:bg-[#1C1C24] w-[455px] mobile:w-full shadow-lg rounded-lg px-[35px] py-[50px]'>
@@ -106,8 +105,16 @@ const VerifyEmailByForgotPass = () => {
             onChange={handleChange}
             numInputs={4}
           />
-          <Countdown date={Date.now() + 10000 * 5.9} renderer={renderer} />
-
+          <div className='flex items-center mt-[20px] gap-x-3'>
+            <button
+              disabled={time <= 0 ? false : true}
+              onClick={handleReSendOtp}
+              className='disabled:opacity-75 font-[600] text-[14px] flex gap-x-[10px] leading-6 text-secondary'
+            >
+              Resend OTP
+            </button>
+            <span>00:{time >= 10 ? time : `0${time}`}</span>
+          </div>
           <button
             onClick={handleVerify}
             className={`bg-primary text-4 mt-[20px] font-[600]  text-white h-[52px] rounded-[10px]  w-full hover:opacity-90`}
@@ -134,7 +141,7 @@ const VerifyEmailByForgotPass = () => {
                 </clipPath>
               </defs>
             </svg>
-            <Link to='/login'>Trở lại Đăng nhập</Link>
+            <button onClick={handleBack}>Trở lại Đăng nhập</button>
           </button>
         </div>
       )}

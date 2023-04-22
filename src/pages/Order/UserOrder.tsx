@@ -94,7 +94,7 @@ const UserOrder = () => {
   }
   return (
     <div>
-      <h1 className='font-[700] mobile:px-[20px] text-[24px] dark:text-white'>{t('order status')}</h1>
+      <h1 className='font-[700] mobile:px-[20px] text-[24px] dark:text-white mb-7 mobile:mb-0'>{t('order status')}</h1>
       {isLoading && (
         <div className='text-center mt-20'>
           <div role='status'>
@@ -121,7 +121,7 @@ const UserOrder = () => {
       {!isLoading && (
         <div className='dark:text-text-color dark:mt-5 '>
           <div className='mobile:px-6'>
-            <div className='flex mb-7'></div>
+            {/* <div className='flex mb-7'></div> */}
             <div className='w-[100%] '>
               <table className='product-list dark:bg-[#1C1C24] dark:rounded-lg shadow-md'>
                 <thead className='mobile:hidden'>
@@ -385,68 +385,70 @@ const UserOrder = () => {
           </div>
         </div>
       )}
-      <Modal
-        isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
-        onRequestClose={closeModal}
-        ariaHideApp={false}
-        style={customStyles}
-        contentLabel='Example Modal'
-      >
-        <div className='flex justify-between items-center'>
-          <div></div>
-          <h2 className='font-bold text-[16px]'>Chọn lý do huỷ</h2>
-          <button onClick={closeModal}>
-            <svg width={45} height={45} viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
-              <rect width={48} height={48} fill='white' fillOpacity='0.01' />
-              <path d='M14 14L34 34' stroke='#333' strokeWidth={1} strokeLinecap='round' strokeLinejoin='round' />
-              <path d='M14 34L34 14' stroke='#333' strokeWidth={1} strokeLinecap='round' strokeLinejoin='round' />
-            </svg>
-          </button>
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            const body = {
-              reason: valueReason,
-              purchase_id: idPurchase
-            }
-            e.preventDefault()
-            setIsOpen(false)
-            cancelBuyMutation.mutate(body)
-          }}
+      <div className='dark:bg-slate-600'>
+        <Modal
+          isOpen={modalIsOpen}
+          onAfterOpen={afterOpenModal}
+          onRequestClose={closeModal}
+          ariaHideApp={false}
+          style={customStyles}
+          // className={`dark:bg-slate-600`}
+          contentLabel='Example Modal'
         >
-          <ul className=' text-sm font-medium text-gray-900 bg-white  rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white'>
-            {reasonList.map((item, index) => (
-              <li key={item.value} className='w-full rounded-t-lg dark:border-gray-600'>
-                <div className='flex items-center pl-3'>
-                  <input
-                    id={`list-radio-passport ${index}`}
-                    type='radio'
-                    name='list-radio'
-                    value={item.value}
-                    onChange={() => setValueReason(item.display)}
-                    className='w-4 h-4 text-red-600 bg-gray-100 border-gray-300  dark:bg-gray-600 dark:border-gray-500'
-                  />
-                  <label
-                    htmlFor={`list-radio-passport ${index}`}
-                    className='w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300'
-                  >
-                    {item.display}
-                  </label>
-                </div>
-              </li>
-            ))}
-            <button
-              type='submit'
-              className={`bg-primary text-4 font-[600]  text-white h-[52px] rounded-[10px]  w-[100%] hover:opacity-90`}
-              // onClick={() => console.log(valueReason)}
-            >
-              {t('ok')}
+          <div className='flex justify-between items-center'>
+            <div></div>
+            <h2 className='font-bold text-[16px]'>Chọn lý do huỷ</h2>
+            <button onClick={closeModal}>
+              <svg width={45} height={45} viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                <rect width={48} height={48} fill='white' fillOpacity='0.01' />
+                <path d='M14 14L34 34' stroke='#333' strokeWidth={1} strokeLinecap='round' strokeLinejoin='round' />
+                <path d='M14 34L34 14' stroke='#333' strokeWidth={1} strokeLinecap='round' strokeLinejoin='round' />
+              </svg>
             </button>
-          </ul>
-        </form>
-      </Modal>
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              const body = {
+                reason: valueReason,
+                purchase_id: idPurchase
+              }
+              e.preventDefault()
+              setIsOpen(false)
+              cancelBuyMutation.mutate(body)
+            }}
+          >
+            <ul className=' text-sm font-medium text-gray-900 bg-white  rounded-lg  dark:border-gray-600 dark:text-white'>
+              {reasonList.map((item, index) => (
+                <li key={item.value} className='w-full rounded-t-lg dark:border-gray-600'>
+                  <div className='flex items-center pl-3'>
+                    <input
+                      id={`list-radio-passport ${index}`}
+                      type='radio'
+                      name='list-radio'
+                      value={item.value}
+                      onChange={() => setValueReason(item.display)}
+                      className='w-4 h-4 text-red-600 bg-gray-100 border-gray-300  dark:bg-gray-600 dark:border-gray-500'
+                    />
+                    <label
+                      htmlFor={`list-radio-passport ${index}`}
+                      className='w-full py-3 ml-2 text-sm font-medium text-gray-900'
+                    >
+                      {item.display}
+                    </label>
+                  </div>
+                </li>
+              ))}
+              <button
+                type='submit'
+                className={`bg-primary text-4 font-[600]  text-white h-[52px] rounded-[10px]  w-[100%] hover:opacity-90`}
+              >
+                {t('ok')}
+              </button>
+            </ul>
+          </form>
+        </Modal>
+      </div>
     </div>
   )
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
 import { sortBy, order as orderConstant } from 'src/constants/product'
 import classNames from 'classnames'
@@ -35,7 +36,8 @@ const SortProductList = ({ categories, queryConfig }: Props) => {
     control,
     handleSubmit,
     trigger,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm<FormData>({
     defaultValues: {
       price_min: '',
@@ -82,10 +84,15 @@ const SortProductList = ({ categories, queryConfig }: Props) => {
   const handleSearchByCategory = (categoryValue: string) => {
     navigate({
       pathname: '/product',
-      search: createSearchParams({
-        ...queryConfig,
-        category: categoryValue
-      }).toString()
+      search: createSearchParams(
+        omit(
+          {
+            ...queryConfig,
+            category: categoryValue
+          },
+          ['page', 'limit']
+        )
+      ).toString()
     })
   }
 
@@ -96,6 +103,7 @@ const SortProductList = ({ categories, queryConfig }: Props) => {
         omit(queryConfig, ['category', 'name', 'price_min', 'price_max', 'rating_filter', 'sort_by', 'order'])
       ).toString()
     })
+    reset()
     setMoreOt(false)
   }
 
@@ -176,22 +184,24 @@ const SortProductList = ({ categories, queryConfig }: Props) => {
             <ul
               className={`${
                 hiddenCat ? 'hidden' : 'block'
-              } overflow-hidden mobile:z-10 absolute dark:bg-[#24242c] dark:text-white flex flex-col top-[100%] bg-white rounded-lg w-full border`}
+              } overflow-hidden overflow-y-scroll custom-scrollbar h-[200px] mobile:z-10 absolute dark:bg-[#24242c] dark:text-white flex flex-col top-[100%] bg-white rounded-lg w-full border`}
             >
-              {categories.map((item) => {
-                const isActive = category === item._id
-                return (
-                  <button
-                    key={item._id}
-                    onClick={() => handleSearchByCategory(item._id as string)}
-                    className={classNames('dark:hover:bg-text-color px-2 py-3 cursor-pointer hover:bg-slate-50', {
-                      'text-secondary': isActive
-                    })}
-                  >
-                    {item.name}
-                  </button>
-                )
-              })}
+              {categories
+                .filter((item: any) => item.parentId)
+                .map((item) => {
+                  const isActive = category === item._id
+                  return (
+                    <button
+                      key={item._id}
+                      onClick={() => handleSearchByCategory(item._id as string)}
+                      className={classNames('dark:hover:bg-text-color px-2 py-3 cursor-pointer hover:bg-slate-50', {
+                        'text-secondary': isActive
+                      })}
+                    >
+                      {item.name}
+                    </button>
+                  )
+                })}
             </ul>
           </div>
           <form onSubmit={onSubmit} className='relative'>

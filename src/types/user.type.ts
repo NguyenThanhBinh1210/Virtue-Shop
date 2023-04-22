@@ -7,6 +7,7 @@ export interface User {
   avatar?: string
   address?: string
   role?: string
+  type?: string
   _id?: string
   createdAt?: string
   updatedAt?: string

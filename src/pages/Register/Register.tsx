@@ -79,7 +79,7 @@ const Register = () => {
             </span>
           </div>
         </div>
-        <div className=''>
+        {/* <div className=''>
           <button
             className={` dark:border-[#3A3A43] flex items-center gap-x-2 w-full justify-center border rounded-md p-2 mb-[10px]`}
           >
@@ -91,7 +91,7 @@ const Register = () => {
           <div className={`dark:text-white text-text-color text-[14px] text-center mobile:text-[12px]`}>
             Hoặc đăng ký bằng email
           </div>
-        </div>
+        </div> */}
         <form onSubmit={handleSubmit(onSubmit)} className='mt-[20px]'>
           <div className='mb-[10px]'>
             <label>

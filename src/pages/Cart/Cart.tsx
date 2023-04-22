@@ -15,19 +15,47 @@ import { toast } from 'react-toastify'
 import { Link, useLocation } from 'react-router-dom'
 import { AppContext } from 'src/contexts/app.context'
 import { useTranslation } from 'react-i18next'
+import { getUser } from 'src/apis/auth.api'
 
 export interface ExtendedPurchase extends Purchase {
   checked: boolean
   disabled: boolean
 }
-
+interface Address {
+  fullName: string
+  address: string
+  city: string
+  phone: string
+}
 const Cart = () => {
   const { t } = useTranslation('cart')
   const location = useLocation()
   const purchaseId = (location.state as { purchaseId: string | null })?.purchaseId
+  const initialState: Address = {
+    fullName: '',
+    address: '',
+    city: '',
+    phone: ''
+  }
 
   const [hidden, setHidden] = useState(false)
+  const [shippingAddress, setShippingAddress] = useState(initialState)
   const profileAccessToken = getProfileFromLS()
+
+  useQuery({
+    queryKey: ['user', profileAccessToken._id],
+    queryFn: () => getUser(profileAccessToken._id),
+    enabled: profileAccessToken._id !== undefined,
+    onSuccess: (data: any) => {
+      const shipping = {
+        fullName: data.data.data.name,
+        address: data.data.data.address,
+        city: data.data.data.city,
+        phone: data.data.data.phone
+      }
+      setShippingAddress(shipping)
+    }
+  })
   const handlerPaymentClick = () => {
     if (checkedPurchasesCount) {
       setHidden(true)
@@ -36,6 +64,11 @@ const Cart = () => {
   const handlerPaymentRemove = () => {
     setHidden(false)
   }
+  const disableShipping =
+    shippingAddress.address === '' ||
+    shippingAddress.fullName === '' ||
+    shippingAddress.city === '' ||
+    shippingAddress.phone === ''
 
   const { extendedPurchases, setExtendedPurchase } = useContext(AppContext)
   const {
@@ -192,6 +225,7 @@ const Cart = () => {
         buy_count: purchase.buy_count
       }))
       const data = {
+        shippingAddress,
         body,
         paymentMethods: 0
       }
@@ -202,6 +236,7 @@ const Cart = () => {
   }
 
   const handleBuyPurchasesOnline = () => {
+    localStorage.setItem('shipping', JSON.stringify(shippingAddress))
     const body = {
       id: profileAccessToken?._id,
       price: totalCheckedPurchasePriceBeforeDiscount,
@@ -212,7 +247,7 @@ const Cart = () => {
 
   return (
     <div>
-      <h1 className='font-[700] dark:text-white mobile:px-[20px] text-[24px]'>{t('your cart')}</h1>
+      <h1 className='font-[700] dark:text-white mobile:px-[20px] mb-7 mobile:mb-0 text-[24px]'>{t('your cart')}</h1>
       {isLoading && (
         <div className='text-center mt-20 '>
           <div role='status'>
@@ -239,7 +274,7 @@ const Cart = () => {
       {!isLoading && (
         <div>
           <div className='mobile:px-6 dark:text-text-color'>
-            <div className='flex mb-7'></div>
+            {/* <div className='flex mb-7'></div> */}
             <div className='w-[100%]'>
               <table className='product-list  shadow-md dark:rounded-lg dark:overflow-hidden'>
                 <thead className='mobile:hidden  dark:bg-[#1C1C24]'>
@@ -403,50 +438,58 @@ const Cart = () => {
               <button onClick={handleDeleteManyPurchase}>{t('delete')}</button>
             </div>
             <div>
-              <div className='flex mt-[80px] mb-[80px] justify-between mobile:block'>
+              <div className=' flex mt-[80px] mb-[80px] justify-between mobile:block'>
                 <div className='p-5 mobile:p-0 dark:text-white'>
                   <div className='mt-[20px] mb-[20px] '>
                     <div className=' dark:text-white font-bold text-xl'>{t('billing information')}</div>
                   </div>
                   <div className='mt-[20px] mb-[20px] '>
                     <input
-                      disabled
-                      className='dark:border-none w-[420px] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
+                      className='dark:border-none dark:bg-[#1C1C24] w-[420px] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
                       type='text'
                       placeholder='Họ và tên'
-                      value={profileAccessToken.name}
+                      value={shippingAddress?.fullName}
+                      onChange={(e) => {
+                        setShippingAddress((prev) => ({ ...prev, fullName: e.target.value }))
+                      }}
                     />
                   </div>
                   <div className='mt-[20px] mb-[20px] '>
                     <input
-                      disabled
-                      className=' dark:border-none w-[420px] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
+                      className=' dark:border-none w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
+                      type='text'
+                      placeholder='Thành phố'
+                      value={shippingAddress?.city}
+                      onChange={(e) => {
+                        setShippingAddress((prev) => ({ ...prev, city: e.target.value }))
+                      }}
+                    />
+                  </div>
+                  <div className='mt-[20px] mb-[20px] '>
+                    <input
+                      className=' dark:border-none w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
                       type='text'
                       placeholder='Địa chỉ giao hàng'
-                      value={profileAccessToken.address}
+                      value={shippingAddress?.address}
+                      onChange={(e) => {
+                        setShippingAddress((prev) => ({ ...prev, address: e.target.value }))
+                      }}
                     />
                   </div>
                   <div className='mt-[20px] mb-[20px] '>
                     <input
-                      disabled
-                      className='dark:border-none w-[420px] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
+                      className='dark:border-none w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
                       type='text'
                       placeholder='Số điện thoại'
-                      value={profileAccessToken.phone}
-                    />
-                  </div>
-                  <div className='mt-[20px] mb-[20px] '>
-                    <input
-                      disabled
-                      className='dark:border-none w-[420px] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
-                      type='text'
-                      placeholder='thongtin@gmail.com'
-                      value={profileAccessToken.email}
+                      value={shippingAddress?.phone}
+                      onChange={(e) => {
+                        setShippingAddress((prev) => ({ ...prev, phone: e.target.value }))
+                      }}
                     />
                   </div>
                 </div>
-                {/* <button onClick={handleBuyPurchasesOnline}>asdasd</button> */}
                 <Bill
+                  shippingAddress={shippingAddress}
                   totalCheckedPurchasePriceBeforeDiscount={totalCheckedPurchasePriceBeforeDiscount}
                   totalCheckedPurchasePrice={totalCheckedPurchasePrice}
                   checkedPurchasesCount={checkedPurchasesCount}
@@ -457,6 +500,7 @@ const Cart = () => {
                   handlerPaymentRemove={handlerPaymentRemove}
                   extendedPurchases={extendedPurchases}
                   disabled={buyPurchaseMutation.isLoading}
+                  disableShipping={disableShipping}
                 />
               </div>
             </div>

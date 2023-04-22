@@ -2,6 +2,7 @@
 import React from 'react'
 import ProductItem from '../ProductItem/ProductItem'
 import { useTranslation } from 'react-i18next'
+import { filter } from 'lodash'
 interface Props {
   product: any
   similarProduct: any
@@ -26,11 +27,14 @@ const DescriptionBlock = ({ product, similarProduct }: Props) => {
       <div className='w-[391px] mobile:w-[327px]'>
         <h1 className='text-[18px] font-[600] mb-[20px]'>{t2('similar product')}</h1>
         <div className='flex flex-col gap-y-[60px] mobile:flex-row mobile:gap-x-[30px] mobile:overflow-x-auto'>
-          {similarProduct?.map((item: any) => (
-            <div key={item._id}>
-              <ProductItem product={item}></ProductItem>
-            </div>
-          ))}
+          {similarProduct
+            ?.filter((item: any) => item._id !== product._id)
+            .slice(0, 4)
+            .map((item: any) => (
+              <div key={item._id}>
+                <ProductItem product={item}></ProductItem>
+              </div>
+            ))}
         </div>
       </div>
     </section>

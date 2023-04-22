@@ -6,7 +6,7 @@ export const getPurchasesOnline = (id: string) => http.get(`/purchase/get-purcha
 
 export const addToCart = (id: string, params: Purchase) => http.post(`/purchase/add-to-cart/${id}`, params)
 
-export const buyProducts = (id: string, body: { product_id: string; buy_count: number }[]) => {
+export const buyProducts = (id: string, body: any) => {
   return http.put<Purchase[]>(`/purchase/buy-products/${id}`, body)
 }
 export const buyProductsOnline = (id: string, body: { id: string; totalPrice: number }) => {

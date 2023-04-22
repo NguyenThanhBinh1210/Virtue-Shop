@@ -12,7 +12,7 @@ const Input = ({ errrorMessage, inputPassword, placeholder, name, register }: Pr
   return (
     <div className='mb-[10px] '>
       <label>
-        <p className={`mb-[10px] mobile:text-[14px] dark:text-text-color`}>{name} *</p>
+        <p className={`mb-[10px] mobile:text-[14px] dark:text-text-color capitalize `}>{name} *</p>
         <input
           type={inputPassword ? 'password' : 'text'}
           {...register(name)}

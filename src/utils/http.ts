@@ -41,7 +41,7 @@ class Http {
     this.instance.interceptors.response.use(
       async (response) => {
         const { url } = response.config
-        if (url === '/user/sign-in' || url === '/user/sign-up') {
+        if (url === '/user/sign-in' || url === '/user/sign-up' || url === '/user/google-login') {
           const dataProfile = response.data.data
           const newUser = omit(dataProfile, ['password', 'isAdmin'])
           this.accessToken = response.data?.access_token

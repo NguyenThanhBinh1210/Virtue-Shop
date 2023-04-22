@@ -12,7 +12,7 @@ const ProductItem = ({ product }: Props) => {
   return (
     <Link to={`/product/${generateNameId({ name: product?.name, id: product?._id })}`}>
       <div className='dark:bg-[#1C1C24] flex flex-col shadow-sm rounded-[15px] mobile:w-[170px] w-[250px]'>
-        <div className='w-[250px] mobile:w-[170px] h-[400px] mobile:h-[250px] rounded-[25px] overflow-hidden '>
+        <div className='w-[250px] mobile:w-[170px] h-[300px] mobile:h-[200px] rounded-[25px] overflow-hidden '>
           <img src={product?.image[0]} alt={product?.name} />
         </div>
         <div className='px-[20px] mobile:w-auto py-[15px] w-[271px] flex flex-col mobile:gap-y-[0px] gap-y-[15px]'>

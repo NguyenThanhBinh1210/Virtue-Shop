@@ -10,6 +10,12 @@ export function isAxiosError<T>(error: unknown): error is AxiosError<T> {
 export function isAxiosUnprocessableEntityError(error: unknown) {
   return isAxiosError(error) && error.response?.status === HttpStatusCode.UnprocessableEntity
 }
+export function isAxiosUnauthorizedError(error: unknown) {
+  return isAxiosError(error) && error.response?.status === HttpStatusCode.Unauthorized
+}
+// export function isAxiosExpiredTokenError(error: unknown) {
+//   return isAxiosUnauthorizedError(error) && error.response?.data.data
+// }
 
 export const isJsonString = (data: any) => {
   try {

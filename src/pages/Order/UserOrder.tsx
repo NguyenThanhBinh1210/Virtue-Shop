@@ -346,9 +346,7 @@ const UserOrder = () => {
                           )}
                           {purchase?.status !== 2 && purchase?.status !== 4 && purchase?.status !== 5 && (
                             <button
-                              onClick={() => {
-                                toast.warn('Đặt hàng xin đừng boom mà!')
-                              }}
+                              onClick={() => openModal(purchase._id)}
                               className='hover:translate-x-0.5 hover:-translate-y-0.5 transition-all'
                             >
                               {t('cancel')}
@@ -385,16 +383,15 @@ const UserOrder = () => {
           </div>
         </div>
       )}
-      <div className='dark:bg-slate-600'>
-        <Modal
-          isOpen={modalIsOpen}
-          onAfterOpen={afterOpenModal}
-          onRequestClose={closeModal}
-          ariaHideApp={false}
-          style={customStyles}
-          // className={`dark:bg-slate-600`}
-          contentLabel='Example Modal'
-        >
+      <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        ariaHideApp={false}
+        style={customStyles}
+        contentLabel='Example Modal'
+      >
+        <div className=''>
           <div className='flex justify-between items-center'>
             <div></div>
             <h2 className='font-bold text-[16px]'>Chọn lý do huỷ</h2>
@@ -447,8 +444,8 @@ const UserOrder = () => {
               </button>
             </ul>
           </form>
-        </Modal>
-      </div>
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -7,7 +7,7 @@ export interface InputNumberProps extends InputHTMLAttributes<HTMLInputElement> 
   placeholder?: string
 }
 const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(function InputNumberInner(
-  { onChange, placeholder, smail, value, ...rest },
+  { onChange, classNameInput, placeholder, smail, value, ...rest },
   ref
 ) {
   const [localValue, setLocalValue] = useState<string>(value as string)
@@ -22,9 +22,11 @@ const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(function Inpu
   return (
     <div>
       <input
-        className={`border h-full w-[80px] mobile:w-[50px] ${
-          smail ? 'text-[14px] py-2 px-1 rounded-lg mobile:w-[80px]' : 'text-[20px]'
-        }  mobile:text-[14px] text-center`}
+        className={`${
+          classNameInput
+            ? classNameInput
+            : 'mobile:text-[14px] text-[20px] text-center border h-full w-[80px] mobile:w-[50px]'
+        } ${smail ? 'text-[14px] py-2 px-1 rounded-lg mobile:w-[80px]' : ''}  `}
         type='text'
         placeholder={placeholder}
         value={value === undefined ? localValue : value}

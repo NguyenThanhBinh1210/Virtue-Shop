@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import { getProfileFromLS, setProfileFromLS, clearLS } from 'src/utils/auth'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { changePassword, getUser, logout, updateUser } from 'src/apis/auth.api'

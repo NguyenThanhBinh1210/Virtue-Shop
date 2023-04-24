@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Link } from 'react-router-dom'
 import { buyProducts, getPurchasesOnline } from 'src/apis/purchase.api'

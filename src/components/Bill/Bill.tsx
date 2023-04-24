@@ -18,11 +18,9 @@ interface Props {
   handleBuyPurchasesOnline: () => void
   disabled: boolean
   shippingAddress: any
-  disableShipping: boolean
 }
 
 function Bill({
-  disableShipping,
   shippingAddress,
   handleBuyPurchasesOnline,
   totalCheckedPurchasePrice,
@@ -36,7 +34,7 @@ function Bill({
 }: Props) {
   const profileAccessToken = getProfileFromLS()
   const { t } = useTranslation('cart')
-
+  const hasUndefined = Object.values(shippingAddress).includes(undefined) || Object.values(shippingAddress).includes('')
   return (
     <div className='mobile:p-0 flex w-[30%] mobile:w-full justify-end mobile:justify-start dark:text-text-color '>
       <div className=' h-[auto] border rounded border-red-400 dark:bg-[#1C1C24] dark:border-none p-6'>
@@ -77,8 +75,10 @@ function Bill({
           <div className='flex justify-end'>
             <button
               onClick={() => {
-                if (disableShipping) {
+                if (hasUndefined) {
                   toast.warn('Chưa điền đủ thông tin thanh toán!')
+                } else if (checkedPurchasesCount == 0) {
+                  toast.warn('Chưa chọn mua sản phẩm nào!')
                 } else {
                   handlerPaymentClick()
                 }

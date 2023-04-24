@@ -16,6 +16,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { AppContext } from 'src/contexts/app.context'
 import { useTranslation } from 'react-i18next'
 import { getUser } from 'src/apis/auth.api'
+import InputNumber from 'src/components/InputNumber/InputNumber'
 
 export interface ExtendedPurchase extends Purchase {
   checked: boolean
@@ -477,13 +478,12 @@ const Cart = () => {
                     />
                   </div>
                   <div className='mt-[20px] mb-[20px] '>
-                    <input
-                      className='dark:border-none w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
-                      type='text'
+                    <InputNumber
                       placeholder='Số điện thoại'
+                      classNameInput='dark:border-none w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
                       value={shippingAddress?.phone}
                       onChange={(e) => {
-                        setShippingAddress((prev) => ({ ...prev, phone: e.target.value }))
+                        setShippingAddress((prev: any) => ({ ...prev, phone: e.target.value }))
                       }}
                     />
                   </div>
@@ -500,7 +500,6 @@ const Cart = () => {
                   handlerPaymentRemove={handlerPaymentRemove}
                   extendedPurchases={extendedPurchases}
                   disabled={buyPurchaseMutation.isLoading}
-                  disableShipping={disableShipping}
                 />
               </div>
             </div>

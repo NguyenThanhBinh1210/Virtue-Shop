@@ -76,8 +76,8 @@ const Dashboard = () => {
         <meta name='description' content='Trang chủ Virtue Shop' />
       </Helmet>
       <div className='flex'>
-        <div className='mobile:ml-[30px]'>
-          <section className='mb-[20px] mobile:w-[350px] '>
+        <div className='mobile:ml-[30px] tablet:mr-10'>
+          <section className='mb-[20px] mobile:w-[90vw] mobile:mr-10'>
             <h1 className='font-[600] text-[18px] leading-7 dark:text-white mb-[20px]'>{t('popular products')}</h1>
             {isLoadingPoppular && (
               <div className='text-center my-20'>
@@ -102,7 +102,7 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
-            <div className='gap-x-[30px] w-full grid grid-cols-4 mobile:flex mobile:w-[100%] mobile:overflow-x-auto'>
+            <div className='gap-x-[30px] w-full grid grid-cols-4 mobile:flex mobile:w-[100%] mobile:mr-10 mobile:overflow-x-auto'>
               {productsPopullarData?.data.data.map((item) => {
                 return (
                   <div key={item._id}>
@@ -112,7 +112,7 @@ const Dashboard = () => {
               })}
             </div>
           </section>
-          <section className='mb-[20px] mobile:w-[350px]'>
+          <section className='mb-[20px] mobile:w-[90vw] mobile:mr-10'>
             <h1 className='font-[600] text-[18px] leading-7 dark:text-white mb-[20px]'>{t('latest products')}</h1>
             {isLoadingRecent && (
               <div className='text-center my-20'>
@@ -137,7 +137,7 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
-            <div className='gap-[30px] grid grid-cols-4 mobile:flex mobile:w-[100%] mobile:overflow-x-auto'>
+            <div className='gap-[30px] grid grid-cols-4  mobile:flex mobile:w-[100%] mobile:overflow-x-auto'>
               {productsRecentData?.data.data.map((item) => {
                 return (
                   <div key={item._id}>
@@ -147,7 +147,7 @@ const Dashboard = () => {
               })}
             </div>
           </section>
-          <section className='mb-[20px] mobile:w-[350px]'>
+          <section className='mb-[20px] mobile:w-[90vw] mobile:mr-10'>
             <h1 className='font-[600] text-[18px] leading-7 dark:text-white mb-[20px]'>{t('selled products')}</h1>
             {isLoadingSelled && (
               <div className='text-center my-20'>

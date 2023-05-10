@@ -65,7 +65,7 @@ const ProductList = () => {
         <>
           {/* <section className='flex justify-center mb-[45px]'>
             <h1 className='font-[700] text-[25px] dark:text-white'>
-              {t('full product')} {dataAll2?.data.data.length}
+              {t('full product')} {productsData.data.data.length}
             </h1>
           </section> */}
           <SortProductList categories={categoriesData?.data.data || []} queryConfig={queryConfig}></SortProductList>

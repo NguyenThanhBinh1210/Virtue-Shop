@@ -23,6 +23,7 @@ import { toast } from 'react-toastify'
 import useDarkMode from 'src/hooks/useDarkMode'
 import { useTranslation } from 'react-i18next'
 import Popover from '../Popover/Popover'
+import { getProfileFromLS } from 'src/utils/auth'
 
 const schema = yup
   .object({
@@ -160,9 +161,11 @@ const DashboardHeader = () => {
             }
             placement='bottom'
           >
-            <div className=' w-[52px] rounded-full overflow-hidden  h-[52px] mobile:w-[40px] mobile:h-[40px] mobile:ml-8 flex items-center justify-center '>
-              <img alt='' className='' src={Frame} />
-            </div>
+            {!isAuthenticated && (
+              <div className=' w-[52px] rounded-full overflow-hidden  h-[52px] mobile:w-[40px] mobile:h-[40px] mobile:ml-8 flex items-center justify-center '>
+                <img alt='' className='' src={Frame} />
+              </div>
+            )}
           </Popover>
           {isAuthenticated ? (
             <div className=' ml-4 mobile:ml-[0px] cursor-pointer'>
@@ -192,7 +195,7 @@ const DashboardHeader = () => {
       <div
         className={`${
           count ? 'translate-x-0' : 'translate-x-[-100%]'
-        } transition-transform dark:bg-[#1C1C24] pt-10 w-[400px] h-[100vh] bg-white fixed z-[1000] top-0 hidden mobile:block `}
+        } transition-transform dark:bg-[#1C1C24] pt-10 w-[250px] border-r h-[100vh] bg-white fixed z-[1000] top-0 hidden mobile:block `}
       >
         <div className='dasboardHeader__mobile  flex  items-center justify-between px-10'>
           <button

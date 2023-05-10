@@ -31,17 +31,12 @@ const UserOrder = () => {
       transform: 'translate(-50%, -50%)'
     }
   }
-  let subtitle: any
   const [modalIsOpen, setIsOpen] = React.useState(false)
   const [valueReason, setValueReason] = React.useState<string>('')
   const [idPurchase, setIdPurchase] = React.useState<string>()
   function openModal(id: string) {
     setIsOpen(true)
     setIdPurchase(id)
-  }
-
-  function afterOpenModal() {
-    subtitle.style.color = '#f00'
   }
 
   function closeModal() {
@@ -93,7 +88,7 @@ const UserOrder = () => {
     })
   }
   return (
-    <div>
+    <div className='tablet:pr-10'>
       <h1 className='font-[700] mobile:px-[20px] text-[24px] dark:text-white mb-7 mobile:mb-0'>{t('order status')}</h1>
       {isLoading && (
         <div className='text-center mt-20'>
@@ -124,7 +119,7 @@ const UserOrder = () => {
             {/* <div className='flex mb-7'></div> */}
             <div className='w-[100%] '>
               <table className='product-list dark:bg-[#1C1C24] dark:rounded-lg shadow-md'>
-                <thead className='mobile:hidden'>
+                <thead className='mobile:hidden tablet:hidden'>
                   <tr>
                     <th>{t('name product')}</th>
                     <th>{t('image')}</th>
@@ -134,12 +129,12 @@ const UserOrder = () => {
                     <th>{t('action')}</th>
                   </tr>
                 </thead>
-                <tbody className='mobile:hidden'>
+                <tbody className='mobile:hidden tablet:hidden'>
                   {purchaseIsOrder &&
                     purchaseIsOrder.map((purchase: any) => {
                       return (
                         <tr key={purchase?._id}>
-                          <td className=''>
+                          <td className='w-[500px] tablet:w-[350px] leading-5'>
                             <div className='mr-4'>{purchase?.product?.name}</div>
                           </td>
                           <td className=''>
@@ -250,12 +245,12 @@ const UserOrder = () => {
                     })}
                 </tbody>
               </table>
-              <div className='hidden mobile:block'>
+              <div className='hidden mobile:block tablet:block'>
                 {purchaseIsOrder &&
                   purchaseIsOrder.map((purchase: any) => (
                     <div
                       key={purchase._id}
-                      className='flex shadow-md p-2 dark:bg-[#1C1C24]  rounded-md items-start mb-4 pl-4 justify-between'
+                      className='flex shadow-md tablet:gap-x-10 mobile:gap-x-10 p-2 dark:bg-[#1C1C24]  rounded-md items-start mb-4 pl-4 justify-between'
                     >
                       <Link
                         to={`/product/${generateNameId({
@@ -267,8 +262,8 @@ const UserOrder = () => {
                           <img src={purchase.product.image[0]} alt='' />
                         </div>
                       </Link>
-                      <div className='w-[60%] grid gap-y-3'>
-                        <div className='mr-4 w-full line-clamp'>{purchase.product.name}</div>
+                      <div className='grid gap-y-3'>
+                        <div className='mr-4 w-full line-clamp-2'>{purchase.product.name}</div>
                         <div>
                           {FormatNumber(
                             Math.ceil(
@@ -385,7 +380,7 @@ const UserOrder = () => {
       )}
       <Modal
         isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
+        // onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
         ariaHideApp={false}
         style={customStyles}

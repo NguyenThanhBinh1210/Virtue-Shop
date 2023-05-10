@@ -274,11 +274,11 @@ const Cart = () => {
       )}
       {!isLoading && (
         <div>
-          <div className='mobile:px-6 dark:text-text-color'>
+          <div className='mobile:px-6 dark:text-text-color tablet:pr-10'>
             {/* <div className='flex mb-7'></div> */}
             <div className='w-[100%]'>
               <table className='product-list  shadow-md dark:rounded-lg dark:overflow-hidden'>
-                <thead className='mobile:hidden  dark:bg-[#1C1C24]'>
+                <thead className='mobile:hidden tablet:hidden dark:bg-[#1C1C24]'>
                   <tr>
                     <th className='flex items-center ml-2'>
                       <input
@@ -296,7 +296,7 @@ const Cart = () => {
                     <th>{t('action')}</th>
                   </tr>
                 </thead>
-                <tbody className='mobile:hidden dark:bg-[#1C1C24]'>
+                <tbody className='mobile:hidden tablet:hidden dark:bg-[#1C1C24]'>
                   {extendedPurchases &&
                     extendedPurchases.map((purchase, index) => (
                       <tr key={purchase._id}>
@@ -308,11 +308,12 @@ const Cart = () => {
                             onChange={handleCheck(index)}
                           />
                         </td>
-                        <td className=''>
+                        <td className='w-[400px] leading-5'>
                           <div className='mr-4'>{purchase.product.name}</div>
                         </td>
                         <td className=''>
                           <Link
+                            className='w-[100px]'
                             to={`/product/${generateNameId({
                               name: purchase.product?.name,
                               id: purchase.product?._id
@@ -360,7 +361,7 @@ const Cart = () => {
                 </tbody>
               </table>
             </div>
-            <div className='hidden mobile:block dark:text-text-color dark:rounded-lg dark:bg-[#1C1C24] '>
+            <div className='hidden tablet:block mobile:block dark:text-text-color dark:rounded-lg dark:bg-[#1C1C24] '>
               {extendedPurchases &&
                 extendedPurchases.map((purchase, index) => (
                   <div
@@ -383,7 +384,7 @@ const Cart = () => {
                         <img src={purchase.product.image[0]} alt='' />
                       </div>
                     </Link>
-                    <div className='w-[60%] grid gap-y-2'>
+                    <div className='w-[60%] tablet:w-[70%] grid gap-y-2'>
                       <div className='mr-4 w-full'>{purchase.product.name}</div>
                       <div>{FormatNumber(purchase.product.price_after_discount)}đ</div>
                       <div className='flex justify-start'>
@@ -439,14 +440,14 @@ const Cart = () => {
               <button onClick={handleDeleteManyPurchase}>{t('delete')}</button>
             </div>
             <div>
-              <div className=' flex mt-[80px] mb-[80px] justify-between mobile:block'>
+              <div className=' flex mt-[80px] tablet:my-[40px] mb-[80px] justify-between mobile:block'>
                 <div className='p-5 mobile:p-0 dark:text-white'>
                   <div className='mt-[20px] mb-[20px] '>
                     <div className=' dark:text-white font-bold text-xl'>{t('billing information')}</div>
                   </div>
-                  <div className='mt-[20px] mb-[20px] '>
+                  <div className='mt-[20px] mb-[20px]'>
                     <input
-                      className='dark:border-none dark:bg-[#1C1C24] w-[420px] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
+                      className='dark:border-none dark:bg-[#1C1C24] tablet:w-[300px] w-[420px] h-[40px] mobile:w-[full] border-2 p-4 rounded-sm'
                       type='text'
                       placeholder='Họ và tên'
                       value={shippingAddress?.fullName}
@@ -457,7 +458,7 @@ const Cart = () => {
                   </div>
                   <div className='mt-[20px] mb-[20px] '>
                     <input
-                      className=' dark:border-none w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
+                      className=' dark:border-none tablet:w-[300px] w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[full] border-2 p-4 rounded-sm'
                       type='text'
                       placeholder='Thành phố'
                       value={shippingAddress?.city}
@@ -468,7 +469,7 @@ const Cart = () => {
                   </div>
                   <div className='mt-[20px] mb-[20px] '>
                     <input
-                      className=' dark:border-none w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
+                      className=' dark:border-none tablet:w-[300px] w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[full] border-2 p-4 rounded-sm'
                       type='text'
                       placeholder='Địa chỉ giao hàng'
                       value={shippingAddress?.address}
@@ -480,7 +481,7 @@ const Cart = () => {
                   <div className='mt-[20px] mb-[20px] '>
                     <InputNumber
                       placeholder='Số điện thoại'
-                      classNameInput='dark:border-none w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[330px] border-2 p-4 rounded-sm'
+                      classNameInput='dark:border-none tablet:w-[300px] w-[420px] dark:bg-[#1C1C24] h-[40px] mobile:w-[full] border-2 p-4 rounded-sm'
                       value={shippingAddress?.phone}
                       onChange={(e) => {
                         setShippingAddress((prev: any) => ({ ...prev, phone: e.target.value }))

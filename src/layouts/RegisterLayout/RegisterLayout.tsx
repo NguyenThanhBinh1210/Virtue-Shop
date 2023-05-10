@@ -9,7 +9,6 @@ const RegisterLayout = ({ children }: Props) => {
     <div className='p-[40px] mobile:p-[20px] dark:bg-[#13131A] min-h-screen'>
       <RegisterHeader></RegisterHeader>
       {children}
-      <Footer></Footer>
     </div>
   )
 }

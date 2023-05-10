@@ -15,7 +15,7 @@ const Button = ({ children }: Props) => {
   return (
     <button
       onClick={(e) => checkType(e)}
-      className={`bg-primary text-4 font-[600]  text-white h-[52px] rounded-[10px]  w-[191px] hover:opacity-90`}
+      className={`bg-primary text-4 font-[600] tablet:w-[100px] text-white h-[52px] rounded-[10px]  w-[191px] hover:opacity-90`}
     >
       {children}
     </button>

@@ -5,6 +5,7 @@ import { getProfileFromLS } from 'src/utils/auth'
 import Close from '../../assets/images/Close.png'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
+import { PayPalButton } from 'react-paypal-button-v2'
 
 interface Props {
   handlerPaymentClick: () => void
@@ -36,8 +37,8 @@ function Bill({
   const { t } = useTranslation('cart')
   const hasUndefined = Object.values(shippingAddress).includes(undefined) || Object.values(shippingAddress).includes('')
   return (
-    <div className='mobile:p-0 flex w-[30%] mobile:w-full justify-end mobile:justify-start dark:text-text-color '>
-      <div className=' h-[auto] border rounded border-red-400 dark:bg-[#1C1C24] dark:border-none p-6'>
+    <div className='mobile:p-0 flex w-[30%] tablet:w-[45%] mobile:w-full justify-end mobile:justify-start dark:text-text-color '>
+      <div className=' h-[auto] rounded shadow-lg dark:bg-[#1C1C24] dark:border-none p-6'>
         <div className=' font-bold text-lg mb-4'>{t('your order').toUpperCase()}</div>
         <div className='flex justify-between mb-6'>
           <div className='font-semibold'>{t('total product')}:</div>
@@ -101,9 +102,9 @@ function Bill({
                       <img src={Close} alt='' />
                     </button>
                   </div>
-                  <div className='mobile:flex-col flex justify-between items-start '>
-                    <div className='w-[50%] mobile:w-[100%]'>
-                      <div className='mt-10 mobile:mt-5'>
+                  <div className='mobile:flex-col flex justify-between items-start mt-5 '>
+                    <div className='w-[50%] border-r mobile:w-[100%]'>
+                      <div className='mobile:mt-5'>
                         <div className='text-primary text-center text-xl font-semibold'>{t('payment on delivery')}</div>
                       </div>
                       <div className='p-4'>
@@ -162,18 +163,35 @@ function Bill({
                       </div>
                     </div>
 
-                    <div className='w-[49%] mobile:w-[100%]'>
-                      <div className='mt-10'>
+                    <div className='w-[50%] mobile:w-[100%]'>
+                      <div className='px-10'>
                         <div className='text-primary text-center text-xl font-semibold'>{t('online payment')}</div>
                         <button
                           onClick={handleBuyPurchasesOnline}
-                          className='h-[50px] mx-auto w-[80%] flex gap-x-6 items-center hover:bg-slate-50 dark:hover:bg-gray-500 dark:hover:text-white dark:bg-gray-700 p-2 rounded-sm'
+                          type='button'
+                          className='h-[50px] w-[100%] mt-2 gap-x-4 text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-800 dark:bg-white dark:border-gray-700 dark:text-gray-900 dark:hover:bg-gray-200 mr-2 mb-2'
                         >
                           <div className='h-full'>
                             <img src='https://developers.momo.vn/v3/vi/img/logo2.svg' alt='' />
                           </div>
                           <div>{t('pay momo')}</div>
                         </button>
+                        {/* <PayPalButton
+                          amount='0.01'
+                          // shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
+                          onSuccess={(details, data) => {
+                            toast.success('OK')
+
+                            // OPTIONAL: Call your server to save the transaction
+                            return fetch('/paypal-transaction-complete', {
+                              method: 'post',
+                              body: JSON.stringify({
+                                orderID: data.orderID
+                              })
+                            })
+                          }}
+                          onError={() => toast.error('Error')}
+                        /> */}
                       </div>
                     </div>
                   </div>

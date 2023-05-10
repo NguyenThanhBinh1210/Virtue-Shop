@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useState } from 'react'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { addToCart } from 'src/apis/purchase.api'
@@ -20,7 +20,6 @@ interface Props {
 const BigItem = ({ product, type }: Props) => {
   const { isAuthenticated } = useContext(AppContext)
   const { t } = useTranslation('product')
-  // const queryClient = useQueryClient()
   const profileAccessToken = getProfileFromLS()
   const [buyCount, setBuyCount] = useState(1)
   const navigate = useNavigate()

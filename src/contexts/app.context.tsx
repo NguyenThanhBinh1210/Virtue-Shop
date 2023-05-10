@@ -22,7 +22,6 @@ export const getInitialAppContext: () => AppContextInterface = () => ({
   reset: () => null
 })
 const initialAppContext = getInitialAppContext()
-
 export const AppContext = createContext<AppContextInterface>(initialAppContext)
 
 export const AppProvider = ({

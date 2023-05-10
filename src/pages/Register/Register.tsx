@@ -1,13 +1,17 @@
-import { useState } from 'react'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useContext, useState } from 'react'
 import Google from '../../assets/images/Google.png'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from 'react-query'
 import * as yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
-import { verifyAccount } from 'src/apis/auth.api'
+import { loginWithGoogle, verifyAccount } from 'src/apis/auth.api'
 import { toast } from 'react-toastify'
 import { Helmet } from 'react-helmet'
+import GoogleLogin from 'react-google-login'
+import omit from 'lodash/omit'
+import { AppContext } from 'src/contexts/app.context'
 
 const schema = yup
   .object({
@@ -29,6 +33,7 @@ const schema = yup
   .required()
 type FormData = yup.InferType<typeof schema>
 const Register = () => {
+  const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const [term, setTerm] = useState(false)
   const {
     register,
@@ -60,7 +65,27 @@ const Register = () => {
       })
     }
   }
+  const clientId = '564948588399-db0beu2kqorqf7rcuolf4u72jf48msek.apps.googleusercontent.com'
 
+  const handleFailure = () => {
+    console.log('Chịu')
+  }
+  const googleLoginMutation = useMutation((body: any) => loginWithGoogle(body))
+  const loginGoogle = (response: any) => {
+    const body = {
+      tokenId: response.tokenId,
+      clientId: clientId
+    }
+    googleLoginMutation.mutate(body, {
+      onSuccess: (data: any) => {
+        const newUser: any = omit(data.data.data, ['password', 'isAdmin'])
+        setProfile(newUser)
+        toast.success('Đăng nhập thành công!')
+        setIsAuthenticated(true)
+        navigate('/')
+      }
+    })
+  }
   return (
     <div className=''>
       <Helmet>
@@ -79,19 +104,30 @@ const Register = () => {
             </span>
           </div>
         </div>
-        {/* <div className=''>
-          <button
-            className={` dark:border-[#3A3A43] flex items-center gap-x-2 w-full justify-center border rounded-md p-2 mb-[10px]`}
-          >
-            <div className='w-6 h-6'>
-              <img src={Google} alt='' />
-            </div>
-            <h1 className={`dark:text-white`}>Đăng nhập bằng Google</h1>
-          </button>
-          <div className={`dark:text-white text-text-color text-[14px] text-center mobile:text-[12px]`}>
-            Hoặc đăng ký bằng email
-          </div>
-        </div> */}
+        <div className=''>
+          <GoogleLogin
+            className='google-btn'
+            clientId={clientId}
+            buttonText='Log in with Google'
+            onSuccess={loginGoogle}
+            onFailure={handleFailure}
+            render={(renderProp) => (
+              <button
+                disabled={renderProp.disabled}
+                onClick={renderProp.onClick}
+                className={`flex items-center gap-x-2 w-full justify-center border dark:border-text-color rounded-md p-2 mb-[10px] dark:text-white `}
+              >
+                <div className='w-6 h-6'>
+                  <img src={Google} alt='' />
+                </div>
+                <h1 className={`dark:text-white`}>Đăng ký bằng Google</h1>{' '}
+              </button>
+            )}
+            scope={'profile email'}
+            cookiePolicy={'single_host_origin'}
+          ></GoogleLogin>
+          <p className='text-center text-text-color mt-4'>Hoặc đăng ký với email</p>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className='mt-[20px]'>
           <div className='mb-[10px]'>
             <label>
@@ -121,7 +157,7 @@ const Register = () => {
           </div>
           <div className='mb-[10px]'>
             <label>
-              <p className={`mb-[10px] mobile:text-[14px] dark:text-text-color `}>Password *</p>
+              <p className={`mb-[10px] mobile:text-[14px] dark:text-text-color `}>Mật khẩu *</p>
 
               <input
                 {...register('password')}

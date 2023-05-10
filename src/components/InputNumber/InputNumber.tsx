@@ -23,9 +23,7 @@ const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(function Inpu
     <div>
       <input
         className={`${
-          classNameInput
-            ? classNameInput
-            : 'mobile:text-[14px] text-[20px] text-center border h-full w-[80px] mobile:w-[50px]'
+          classNameInput ? classNameInput : 'mobile:text-[14px]  text-center border h-full w-[80px] mobile:w-[50px]'
         } ${smail ? 'text-[14px] py-2 px-1 rounded-lg mobile:w-[80px]' : ''}  `}
         type='text'
         placeholder={placeholder}

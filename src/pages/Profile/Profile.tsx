@@ -9,6 +9,8 @@ import Frame from '../../assets/images/Frame.jpg'
 import FileBase from 'react-file-base64'
 import { AppContext } from 'src/contexts/app.context'
 import { useTranslation } from 'react-i18next'
+import axios from 'axios'
+import useDebounce from 'src/hooks/useDebounce'
 
 type FormStateType = Omit<User, '_id'>
 const Profile = () => {
@@ -22,15 +24,17 @@ const Profile = () => {
     email: '',
     phone: 0,
     address: '',
-    avatar: ''
+    avatar: '',
+    city: ''
   }
   const initialPasswordState = {
     password: '',
     newPassword: ''
   }
   const [formState, setFormState] = useState<FormStateType>(initialFromState)
+  const [formCity, setFormCity] = useState<any>()
   const [passwordState, setPasswordState] = useState(initialPasswordState)
-
+  const [showCity, setShowCity] = useState(false)
   const { isLoading } = useQuery({
     queryKey: ['user', profileAccessToken._id],
     queryFn: () => getUser(profileAccessToken._id),
@@ -38,6 +42,13 @@ const Profile = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: (data: any) => {
       setFormState(data.data.data)
+    }
+  })
+  useQuery({
+    queryKey: ['test'],
+    queryFn: () => axios.get('https://provinces.open-api.vn/api/?depth=2'),
+    onSuccess: (data) => {
+      setFormCity(data.data)
     }
   })
 
@@ -192,24 +203,67 @@ const Profile = () => {
                     onChange={handleChange('name')}
                   />
                 </div>
-                <div>
-                  <label
-                    htmlFor='company'
-                    className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900 '
-                  >
-                    {t2('address')}
-                  </label>
-                  <input
-                    disabled={isDisabled}
-                    type='text'
-                    id='company'
-                    className='dark:bg-[#1C1C24] dark:text-text-color dark:border-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-primary block w-full p-2.5 '
-                    placeholder='Flowbite'
-                    required
-                    value={formState.address}
-                    onChange={handleChange('address')}
-                  />
+                <div className='grid grid-cols-5 gap-x-2 w-full'>
+                  <div className='col-span-2 relative'>
+                    <label
+                      htmlFor='company'
+                      className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900 '
+                    >
+                      {t2('city')}
+                    </label>
+                    <input
+                      disabled={isDisabled}
+                      type='text'
+                      autoComplete='false'
+                      id='company-k'
+                      className='dark:bg-[#1C1C24] dark:text-text-color dark:border-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-primary block w-full p-2.5 '
+                      placeholder={t2('city') || ''}
+                      required
+                      onFocus={() => setShowCity(true)}
+                      value={formState.city}
+                    />
+                    {showCity && (
+                      <ul
+                        className={` overflow-hidden overflow-y-scroll custom-scrollbar h-[200px] mobile:z-10 absolute dark:bg-[#24242c] dark:text-white flex flex-col top-[100%] bg-white rounded-lg w-full border`}
+                      >
+                        {formCity?.map((item: any) => {
+                          return (
+                            <button
+                              type='button'
+                              className='py-1.5 dark:hover:bg-text-color cursor-pointer hover:bg-slate-50'
+                              key={item.code}
+                              onClick={() => {
+                                setFormState((prev) => ({ ...prev, city: item.name }))
+                                setShowCity(false)
+                              }}
+                            >
+                              {item.name}
+                            </button>
+                          )
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                  <div className='col-span-3'>
+                    <label
+                      htmlFor='company'
+                      className='dark:text-text-color block mb-2 text-sm font-medium text-gray-900 '
+                    >
+                      {t2('address')}
+                    </label>
+                    <input
+                      disabled={isDisabled}
+                      type='text'
+                      id='company'
+                      className='dark:bg-[#1C1C24] dark:text-text-color dark:border-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-primary block w-full p-2.5 '
+                      placeholder='Flowbite'
+                      required
+                      value={formState.address}
+                      onChange={handleChange('address')}
+                    />
+                  </div>
                 </div>
+
                 <div>
                   <label
                     htmlFor='phone'

@@ -1,4 +1,5 @@
 export interface User {
+  city?: string
   name?: string
   email?: string
   password?: string

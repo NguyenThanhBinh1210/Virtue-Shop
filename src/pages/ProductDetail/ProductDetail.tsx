@@ -102,7 +102,7 @@ const ProductDetail = () => {
           <div className='h-[140px] mobile:h-[90px] mobile:w-[100%] mb-10 mobile:mb-5 rounded-[25px] w-[100%] relative'>
             <div className=' h-full overflow-hidden rounded-[25px]'>
               <img
-                src='https://niemvuilaptrinh.ams3.cdn.digitaloceanspaces.com/background-css-javascript/Scrolling%20Background%20Effect.png'
+                src='https://img1.kienthucvui.vn/uploads/2019/10/09/anh-bau-troi-cuc-dep-voi-canh-chim-co-don_042050853.jpg'
                 alt=''
               />
             </div>

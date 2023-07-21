@@ -12,7 +12,7 @@ import EvaluateBlock from 'src/components/EvaluateBlock/EvaluateBlock'
 import DescriptionBlock from 'src/components/DescriptionBlock/DescriptionBlock'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
-
+import DetailImg from 'src/assets/images/detail.jpg'
 const ProductDetail = () => {
   const [acctive, setActive] = useState(1)
   const { id: nameId } = useParams()
@@ -101,10 +101,7 @@ const ProductDetail = () => {
         <div>
           <div className='h-[140px] mobile:h-[90px] mobile:w-[100%] mb-10 mobile:mb-5 rounded-[25px] w-[100%] relative'>
             <div className=' h-full overflow-hidden rounded-[25px]'>
-              <img
-                src='https://niemvuilaptrinh.ams3.cdn.digitaloceanspaces.com/background-css-javascript/Scrolling%20Background%20Effect.png'
-                alt=''
-              />
+              <img src={DetailImg} alt='' />
             </div>
             <h1 className='font-[700] text-[40px] absolute mobile:text-[20px] top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%] text-white'>
               {product?.category.name ? <div>{product?.category.name}</div> : null}

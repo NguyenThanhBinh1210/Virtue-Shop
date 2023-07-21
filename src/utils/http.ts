@@ -20,7 +20,7 @@ class Http {
     this.refreshToken = getRefreshTokenFromLS()
     this.refreshTokenRequest = null
     this.instance = axios.create({
-      baseURL: 'http://localhost:5000/api/',
+      baseURL: 'https://api-thuong-mai.vercel.app/api/',
       // baseURL: 'https://api-virtue-shop.onrender.com/api/',
       timeout: 10000,
       headers: {
